@@ -1,0 +1,144 @@
+// UmmahMonitor data layer.
+// Postgres in production (serverless hosts like Vercel don't persist files
+// created during build, so SQLite doesn't work there).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Country {
+  name       String  @id
+  flag       String
+  code       String
+  lon        Float
+  lat        Float
+  score      Int
+  trend      String // up | down | flat
+  components String // JSON: { Safety, Humanitarian, Worship, Economy }
+  events     Event[]
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  category    String
+  title       String
+  countryName String
+  country     Country  @relation(fields: [countryName], references: [name])
+  lat         Float
+  lon         Float
+  severity    String
+  timestamp   DateTime
+  what        String
+  why         String
+  status      String
+  keywords    String // JSON array
+  timeline    String // JSON array of { at, text }
+  related     String // JSON array of event ids
+  response    String? // JSON ResponseModule
+  pending     Boolean  @default(false)
+  conflicting Boolean  @default(false)
+  // Optional confidence override; when null, derived from sources by the
+  // shared confidence service (never stored, always recomputed).
+  confidenceOverride Int?
+  sources     Source[]
+
+  @@index([category])
+  @@index([pending])
+}
+
+model Source {
+  id       Int     @id @default(autoincrement())
+  name     String
+  verified Boolean @default(false)
+  tier     String? // official | wire | relief | regional | community (inferred if null)
+  event    Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId  Int
+
+  @@index([eventId])
+}
+
+// Community/partner submissions awaiting human review.
+model ModerationItem {
+  id          Int      @id @default(autoincrement())
+  category    String
+  countryName String
+  severity    String
+  title       String
+  submitter   String
+  submittedAt DateTime @default(now())
+  trustScore  Int // precomputed confidence for this submission (0-100)
+  mediaCount  Int      @default(0)
+  flagged     Boolean  @default(false)
+  conflicting Boolean  @default(false)
+  checks      String // JSON array of { label, detail, ok }
+  aiVerdict   String
+  body        String
+  sources     String // JSON array of { name, verified, tier? }
+  decision    String? // approved | rejected | flagged | null
+  decidedAt   DateTime?
+  decidedBy   String?
+
+  @@index([decision])
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
+  donations    Donation[]
+
+  // Authorization — "user" | "moderator" | "admin". Named distinctly from
+  // the onboarding "role" field below (which is a job-title like Researcher/
+  // Journalist, unrelated to permissions). Never settable via the public
+  // signup/onboarding APIs; only changed directly in the DB or by an
+  // existing admin through an internal tool.
+  authRole   String  @default("user")
+
+  // Onboarding preferences — collected in the /onboarding flow, applied to
+  // the dashboard's default feed filters and (eventually) alert delivery.
+  onboarded  Boolean @default(false)
+  role       String?
+  categories String? // JSON array of category keys
+  regions    String? // JSON array of region keys
+  severity   String  @default("high") // all | medium | high | critical
+  digest     String  @default("daily") // real-time | hourly | daily | weekly
+  channels   String? // JSON: { inapp, email, whatsapp }
+}
+
+// Server-side session persistence — opaque token stored hashed, matched to a
+// signed httpOnly cookie.
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([userId])
+}
+
+model Donation {
+  id             String   @id @default(cuid())
+  org            String
+  appeal         String
+  amount         Int // minor units (cents)
+  currency       String   @default("usd")
+  eventId        Int?
+  status         String // pending | completed | canceled
+  provider       String // stripe | stub
+  providerRef    String? // Stripe checkout session id
+  user           User?    @relation(fields: [userId], references: [id])
+  userId         String?
+  createdAt      DateTime @default(now())
+
+  @@index([status])
+}

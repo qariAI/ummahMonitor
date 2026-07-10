@@ -1,0 +1,114 @@
+/* Design tokens — values from README "Design Tokens". Dark is default; the
+   theme is stamped via data-theme on <html> and read before first paint. */
+
+:root {
+  --faith: #3dd68c; /* positive / verified / published */
+  --community: #5ea8ff;
+  --humanitarian: #f0b04a; /* developing / warning */
+  --conflict: #f16a5e; /* withheld / rejected / critical */
+  --economy: #a78bfa;
+  --education: #2dd4bf;
+
+  --radius: 14px;
+  --radius-sm: 10px;
+
+  --display: "Amiri", Georgia, serif;
+  --sans: "Inter", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+}
+
+/* Dark theme (default) */
+:root,
+:root[data-theme="dark"] {
+  --bg: #080c11;
+  --bg2: #0e141b;
+  --panel: rgba(14, 20, 27, 0.86);
+  --panel-solid: #0f1620;
+  --stroke: rgba(148, 168, 190, 0.13);
+  --stroke2: rgba(148, 168, 190, 0.24);
+  --text: #e9eef4;
+  --muted: #8a98a8;
+  --faint: #556475;
+  --dot: rgba(148, 168, 190, 0.14);
+  --shadow: 0 14px 48px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="light"] {
+  --bg: #eef1f4;
+  --bg2: #e4e8ed;
+  --panel: rgba(255, 255, 255, 0.88);
+  --panel-solid: #ffffff;
+  --stroke: rgba(30, 50, 70, 0.1);
+  --stroke2: rgba(30, 50, 70, 0.2);
+  --text: #0f1720;
+  --muted: #586878;
+  --faint: #93a2b1;
+  --dot: rgba(30, 50, 70, 0.08);
+  --shadow: 0 14px 48px rgba(20, 40, 60, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--faith) 30%, transparent);
+}
+
+h1,
+h2 {
+  font-family: var(--display);
+  font-weight: 700;
+}
+
+.mono {
+  font-family: var(--mono);
+}
+
+/* scrollbars */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--stroke2);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
