@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getCountry, listEvents } from "@/lib/repos";
 import { Nav } from "@/components/Nav";
 import { FollowCountryButton } from "@/components/FollowCountryButton";
+import { CountryBriefing } from "@/components/CountryBriefing";
 import { CATEGORIES, scoreColorToken, trendGlyph } from "@/lib/client";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +29,7 @@ export default async function CountryPage({ params }: { params: Promise<{ name: 
         </div>
 
         <div className="card-grid">
+          <CountryBriefing country={country.name} />
           <div className="card">
             <h3 title="Composite of Safety, Humanitarian, Worship &amp; Economy indicators (0–100, higher = more severe)">Situation Index</h3>
             <p style={{ fontSize: 11.5, color: "var(--faint)", margin: "-6px 0 12px", lineHeight: 1.4 }}>

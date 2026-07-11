@@ -10,6 +10,14 @@
   --education: #2dd4bf;
   --good-news: #ffd23f; /* hope / uplifting — deliberately the warmest, most joyful tone */
 
+  /* Situation Index severity bands — intentionally separate from the
+     category colors above, so a country's 0–100 score always reads the
+     same way (green→red) regardless of what category tokens mean elsewhere. */
+  --score-low: #3dd68c;      /* 0–25 */
+  --score-medium: #e8d44d;   /* 26–50 */
+  --score-high: #f0973f;     /* 51–75 */
+  --score-critical: #f0453a; /* 76–100 */
+
   --radius: 14px;
   --radius-sm: 10px;
 

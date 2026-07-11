@@ -16,6 +16,7 @@ function StarMark() {
 
 const BASE_LINKS = [
   { href: "/", label: "Map" },
+  { href: "/data", label: "Data Intelligence" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/holy-sites", label: "Holy sites" },
   { href: "/analytics", label: "Analytics" },

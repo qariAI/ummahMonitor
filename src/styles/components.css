@@ -256,15 +256,17 @@
   z-index: 38;
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 18px;
   padding: 0 16px;
   background: var(--panel-solid);
   border-bottom: 1px solid var(--stroke);
+  overflow-x: auto;
 }
-.stat-card { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+.stat-card { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); flex: none; }
+.stat-card-divider { padding-left: 18px; border-left: 1px solid var(--stroke); }
 .stat-icon { font-size: 13px; }
 .stat-num { font-family: var(--mono); font-weight: 700; color: var(--text); }
-.stat-lbl { color: var(--faint); }
+.stat-lbl { color: var(--faint); white-space: nowrap; }
 .ticker-scroll { display: flex; gap: 44px; white-space: nowrap; animation: ticker-scroll 78s linear infinite; padding-left: 56px; }
 .ticker:hover .ticker-scroll { animation-play-state: paused; }
 @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
@@ -464,6 +466,32 @@
 }
 .ai-hd button { margin-left: auto; font-size: 10px; color: var(--muted); }
 .ai-load { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 12.5px; }
+
+/* Daily/country AI briefing panel — the synthesis feature, given real
+   visual weight (gold accent, sits above the raw feed) since it's the
+   product's highest-value surface. */
+.briefing-panel {
+  border-bottom: 1px solid var(--stroke);
+  background: color-mix(in srgb, var(--good-news) 5%, transparent);
+}
+.briefing-hd {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 15px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.briefing-title { font-weight: 700; font-size: 13.5px; color: var(--text); }
+.briefing-meta { margin-left: auto; font-family: var(--mono); font-size: 10.5px; color: var(--faint); }
+.briefing-chevron { color: var(--faint); font-size: 11px; }
+.briefing-body { padding: 0 15px 13px; }
+.briefing-body ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.briefing-body li { font-size: 12.5px; line-height: 1.5; color: var(--text); }
+.briefing-fallback { font-size: 10.5px; color: var(--faint); margin: 8px 0 0; font-style: italic; }
 .spinner {
   width: 13px;
   height: 13px;
@@ -700,3 +728,27 @@
 .card { background: var(--panel-solid); border: 1px solid var(--stroke); border-radius: var(--radius); padding: 20px; }
 .card h3 { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin: 0 0 14px; font-weight: 700; }
 .badge { font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.06em; padding: 3px 7px; border-radius: 5px; text-transform: uppercase; }
+
+/* ── Data Intelligence page ────────────────────────────────────────────── */
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 22px; }
+.kpi-card { background: var(--panel-solid); border: 1px solid var(--stroke); border-radius: var(--radius); padding: 16px 18px; }
+.kpi-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.kpi-icon { font-size: 18px; }
+.kpi-accent { width: 8px; height: 8px; border-radius: 50%; }
+.kpi-num { font-family: var(--mono); font-size: 30px; font-weight: 700; color: var(--text); line-height: 1; }
+.kpi-lbl { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+.viz-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 16px; }
+.viz-card { background: var(--panel-solid); border: 1px solid var(--stroke); border-radius: var(--radius); padding: 18px; }
+.viz-hd { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.viz-hd h3 { font-size: 14px; font-weight: 700; margin: 0; color: var(--text); }
+.viz-sub { font-size: 10.5px; color: var(--faint); }
+.viz-back { background: none; border: none; color: var(--faith); font-size: 11px; cursor: pointer; padding: 0; }
+.viz-svg { width: 100%; height: auto; overflow: visible; }
+.viz-axis-label { font-size: 9px; fill: var(--faint); font-family: var(--mono); }
+.viz-axis-title { font-size: 10px; fill: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.06em; }
+.viz-bubble-label { font-size: 9px; fill: var(--text); font-weight: 700; pointer-events: none; }
+.viz-tooltip-title { font-size: 11.5px; fill: var(--text); font-weight: 700; }
+.viz-tooltip-line { font-size: 10px; fill: var(--muted); }
+.viz-tile-title { font-size: 12px; fill: var(--text); font-weight: 700; pointer-events: none; }
+.viz-tile-sub { font-size: 10px; fill: var(--muted); pointer-events: none; }

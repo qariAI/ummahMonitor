@@ -2,7 +2,7 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import type { CountryDTO, EventDTO } from "@/lib/repos";
-import { CATEGORIES, resolveVar, severityToken } from "@/lib/client";
+import { CATEGORIES, resolveVar, scoreColorToken, severityToken } from "@/lib/client";
 import type { QuakeMarker } from "@/lib/liveQuakes";
 import type { FlightMarker } from "@/lib/liveFlights";
 
@@ -390,7 +390,7 @@ export const WorldMap = forwardRef<WorldMapHandle, {
         for (const c of countries) {
           const p = project(c.pos[0], c.pos[1], w, h);
           const radius = 8 + (c.score / 100) * 34;
-          const tok = c.score >= 75 ? "--conflict" : c.score >= 50 ? "--humanitarian" : c.score >= 30 ? "--economy" : "--faith";
+          const tok = scoreColorToken(c.score);
           const col = resolveVar(tok);
           ctx.beginPath();
           ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);

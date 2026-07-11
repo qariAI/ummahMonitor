@@ -1,15 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { CountryDTO, EventDTO } from "@/lib/repos";
-import { CATEGORIES, ago } from "@/lib/client";
+import { CATEGORIES, ago, scoreColorToken } from "@/lib/client";
 import { CORRIDORS } from "./WorldMap";
 
 const TREND_GLYPH: Record<string, string> = { up: "▲", down: "▼", flat: "─" };
 const SEV_WEIGHT: Record<string, number> = { critical: 3, high: 2, medium: 1, low: 0 };
 
-function scoreToken(score: number): string {
-  return score >= 75 ? "--conflict" : score >= 50 ? "--humanitarian" : score >= 30 ? "--economy" : "--faith";
-}
 
 const STATUS_LABEL: Record<string, string> = { active: "active", strained: "strained", closed: "closed" };
 
@@ -34,6 +32,19 @@ export function SignalsRail({
     .sort((a, b) => (SEV_WEIGHT[b.severity] ?? 0) - (SEV_WEIGHT[a.severity] ?? 0))
     .slice(0, 8);
 
+  // Cycle the spotlight through distinct crisis-affected countries every 4s —
+  // keeps the panel feeling alive without needing new data. Purely a rotating
+  // view of the same real crises listed below, not separate content.
+  const spotlightCountries = Array.from(new Set(crises.map((e) => e.country)));
+  const [spotlightIdx, setSpotlightIdx] = useState(0);
+  useEffect(() => {
+    if (spotlightCountries.length < 2) return;
+    const id = setInterval(() => setSpotlightIdx((i) => (i + 1) % spotlightCountries.length), 4000);
+    return () => clearInterval(id);
+  }, [spotlightCountries.length]);
+  const spotlightCountry = spotlightCountries[spotlightIdx % spotlightCountries.length];
+  const spotlightCrisis = crises.find((e) => e.country === spotlightCountry);
+
   return (
     <aside className="rail signals-rail">
       <div className="rail-hd">
@@ -51,9 +62,9 @@ export function SignalsRail({
         </p>
         {topCountries.map((c) => (
           <button key={c.name} className="idx" onClick={() => onSelectCountry(c)}>
-            <span className="sd" style={{ background: `var(${scoreToken(c.score)})` }} />
+            <span className="sd" style={{ background: `var(${scoreColorToken(c.score)})` }} />
             <span className="cn">{c.code}</span>
-            <span className="bar"><i style={{ width: `${c.score}%`, background: `var(${scoreToken(c.score)})` }} /></span>
+            <span className="bar"><i style={{ width: `${c.score}%`, background: `var(${scoreColorToken(c.score)})` }} /></span>
             <span className="sc">{c.score}</span>
             <span className={`tr ${c.trend}`}>{TREND_GLYPH[c.trend] ?? "─"}</span>
           </button>
@@ -65,6 +76,20 @@ export function SignalsRail({
           <h3>Crisis Tracker</h3>
           <span className="tag">{crises.length} active</span>
         </div>
+        {spotlightCrisis && (
+          <button
+            key={spotlightCountry}
+            className="cri"
+            onClick={() => onSelectEvent(spotlightCrisis.id)}
+            style={{ background: "color-mix(in srgb, var(--conflict) 7%, transparent)", borderRadius: 8, marginBottom: 8, animation: "ev-in 0.4s ease" }}
+          >
+            <span className="sd" style={{ background: `var(${CATEGORIES[spotlightCrisis.category].token})` }} />
+            <span className="cri-body">
+              <span className="ct-t" style={{ fontWeight: 700 }}>{spotlightCountry}</span>
+              <span className="ct-s">{spotlightCrisis.title}</span>
+            </span>
+          </button>
+        )}
         {crises.map((e) => (
           <button key={e.id} className="cri" onClick={() => onSelectEvent(e.id)}>
             <span className="sd" style={{ background: `var(${CATEGORIES[e.category].token})` }} />

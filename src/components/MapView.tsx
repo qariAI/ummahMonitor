@@ -9,6 +9,7 @@ import type { QuakeMarker } from "@/lib/liveQuakes";
 import type { FlightMarker } from "@/lib/liveFlights";
 import { StatsBar } from "./StatsBar";
 import { MapSummaryWidget } from "./MapSummaryWidget";
+import { DailyBriefing } from "./DailyBriefing";
 import { Dossier } from "./Dossier";
 import { SubmitReport } from "./SubmitReport";
 import { Ticker } from "./Ticker";
@@ -27,6 +28,7 @@ export function MapView({
 }) {
   const { user } = useAuth();
   const [events, setEvents] = useState(initialEvents);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState(() => Date.now());
   const [range, setRange] = useState<Range>("all");
   const [active, setActive] = useState<Record<CategoryKey, boolean>>({
     faith: true, community: true, humanitarian: true, conflict: true, economy: true, education: true, good_news: true,
@@ -89,11 +91,19 @@ export function MapView({
     });
   }, [user]);
 
-  // Re-fetch when the time range changes.
+  // Re-fetch when the time range changes, and periodically thereafter so
+  // "Last updated" reflects real refreshes, not just the initial page load.
   useEffect(() => {
-    api<{ events: EventDTO[] }>(`/api/events?range=${range}`)
-      .then((r) => setEvents(r.events))
-      .catch(() => {});
+    let stop = false;
+    async function fetchEvents() {
+      try {
+        const r = await api<{ events: EventDTO[] }>(`/api/events?range=${range}`);
+        if (!stop) { setEvents(r.events); setLastUpdatedAt(Date.now()); }
+      } catch {}
+    }
+    fetchEvents();
+    const id = setInterval(fetchEvents, 120_000);
+    return () => { stop = true; clearInterval(id); };
   }, [range]);
 
   const filtered = useMemo(
@@ -124,7 +134,7 @@ export function MapView({
       </Nav>
 
       <Ticker events={filtered} onSelect={setSelectedId} />
-      <StatsBar events={events} countries={countries} />
+      <StatsBar events={events} countries={countries} lastUpdatedAt={lastUpdatedAt} />
 
       <div
         className={`map-screen${filtered.length ? " with-two-tickers" : " with-ticker"}`}
@@ -142,12 +152,16 @@ export function MapView({
 
         {/* Event feed */}
         <div className="feed-panel">
+          <DailyBriefing />
           <div className="rail-hd">
             <span className="live-dot" />
             <h2>Live feed</h2>
             <span className="count">{filtered.length} events</span>
           </div>
           <div className="chips">
+            <span style={{ width: "100%", fontSize: 10, color: "var(--faint)", marginBottom: 2 }}>
+              Legend — tap a category to filter
+            </span>
             {(Object.keys(CATEGORIES) as CategoryKey[]).map((c) => (
               <button
                 key={c}
@@ -226,7 +240,7 @@ export function MapView({
         <SubmitReport
           countries={countries}
           onClose={() => setSubmitOpen(false)}
-          onSubmitted={() => api<{ events: EventDTO[] }>(`/api/events?range=${range}`).then((r) => setEvents(r.events)).catch(() => {})}
+          onSubmitted={() => api<{ events: EventDTO[] }>(`/api/events?range=${range}`).then((r) => { setEvents(r.events); setLastUpdatedAt(Date.now()); }).catch(() => {})}
         />
       )}
     </>

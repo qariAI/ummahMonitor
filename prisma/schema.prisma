@@ -161,3 +161,20 @@ model Donation {
 
   @@index([status])
 }
+
+// Cached AI-generated situational summaries — "scope" is either "global"
+// (the daily Ummah-wide briefing) or a country name (a country-specific
+// briefing). Cached rather than regenerated per page-load: this is the
+// same cost-control gap flagged for /api/brief in the original launch
+// audit, so briefings are generated at most once per REFRESH_INTERVAL and
+// reused for every visitor in between.
+model Briefing {
+  id          String   @id @default(cuid())
+  scope       String   // "global" | a Country.name
+  bullets     String   // JSON array of strings
+  readSeconds Int
+  live        Boolean  // true if LLM-generated, false if fallback text
+  generatedAt DateTime @default(now())
+
+  @@index([scope, generatedAt])
+}

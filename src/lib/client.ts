@@ -69,8 +69,10 @@ export function severityIcon(sev: string): string {
   return sev === "critical" ? "🔴" : sev === "high" ? "🟠" : sev === "medium" ? "🟡" : "🟢";
 }
 
+/** Situation Index (0–100) → severity-band color token. Green→yellow→orange→red,
+ *  deliberately distinct from category tokens so this always reads the same way. */
 export function scoreColorToken(score: number): string {
-  return score >= 75 ? "--conflict" : score >= 50 ? "--humanitarian" : score >= 30 ? "--economy" : "--faith";
+  return score > 75 ? "--score-critical" : score > 50 ? "--score-high" : score > 25 ? "--score-medium" : "--score-low";
 }
 
 export function trustScoreToken(score: number): string {
