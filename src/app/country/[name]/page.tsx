@@ -30,6 +30,9 @@ export default async function CountryPage({ params }: { params: Promise<{ name: 
         <div className="card-grid">
           <div className="card">
             <h3 title="Composite of Safety, Humanitarian, Worship &amp; Economy indicators (0–100, higher = more severe)">Situation Index</h3>
+            <p style={{ fontSize: 11.5, color: "var(--faint)", margin: "-6px 0 12px", lineHeight: 1.4 }}>
+              Composite score (0–100) from conflict, humanitarian need, disaster impact &amp; verified developments.
+            </p>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <div className="score-num" style={{ color: `var(${scoreColorToken(country.score)})`, fontSize: 52 }}>{country.score}</div>
               <div>

@@ -50,9 +50,17 @@ const CHANNEL_DEFS = [
   { key: "whatsapp", icon: "📱", label: "WhatsApp alerts", desc: "Critical events sent via WhatsApp Business API" },
 ] as const;
 
-const STEP_CONTEXT = [
+const STEP_CONTEXT: {
+  tag: string;
+  title: string;
+  tagline?: string;
+  body: string;
+  token: string;
+  stats: { icon: string; val: string; label: string }[];
+}[] = [
   {
     tag: "Welcome", title: "Intelligence built for the Ummah",
+    tagline: "Trusted signals. Global perspective.",
     body: "From Makkah to Manitoba — monitor what matters to Muslim communities worldwide, in one place.",
     token: "--faith",
     stats: [{ icon: "🌍", val: "1.8B", label: "Muslims tracked" }, { icon: "📡", val: "340+", label: "live sources" }, { icon: "⚡", val: "<4min", label: "avg alert lag" }],
@@ -61,7 +69,7 @@ const STEP_CONTEXT = [
     tag: "Categories", title: "Your feed, your priorities",
     body: "Each category draws from dedicated source networks — toggle only what matters to your work.",
     token: "--community",
-    stats: [{ icon: "🏷️", val: "6", label: "categories" }, { icon: "📰", val: "340+", label: "sources" }, { icon: "🔔", val: "Custom", label: "per-cat alerts" }],
+    stats: [{ icon: "🏷️", val: "7", label: "categories" }, { icon: "📰", val: "340+", label: "sources" }, { icon: "🔔", val: "Custom", label: "per-cat alerts" }],
   },
   {
     tag: "Regions", title: "Geography shapes everything",
@@ -196,6 +204,11 @@ export default function OnboardingPage() {
             {ctx.tag}
           </div>
           <h2 style={{ fontFamily: "var(--display)", fontSize: 36, lineHeight: 1.18, fontWeight: 700, marginBottom: 16 }}>{ctx.title}</h2>
+          {ctx.tagline && (
+            <p style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.02em", color: `var(${ctx.token})`, marginBottom: 10 }}>
+              {ctx.tagline}
+            </p>
+          )}
           <p style={{ fontSize: 14, lineHeight: 1.72, color: "var(--muted)", maxWidth: 320 }}>{ctx.body}</p>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 32 }}>

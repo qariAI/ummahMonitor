@@ -265,7 +265,7 @@
 .stat-icon { font-size: 13px; }
 .stat-num { font-family: var(--mono); font-weight: 700; color: var(--text); }
 .stat-lbl { color: var(--faint); }
-.ticker-scroll { display: flex; gap: 38px; white-space: nowrap; animation: ticker-scroll 60s linear infinite; padding-left: 38px; }
+.ticker-scroll { display: flex; gap: 44px; white-space: nowrap; animation: ticker-scroll 78s linear infinite; padding-left: 56px; }
 .ticker:hover .ticker-scroll { animation-play-state: paused; }
 @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) { .ticker-scroll { animation: none; } }

@@ -20,7 +20,7 @@ export function Ticker({ events, onSelect }: { events: EventDTO[]; onSelect: (id
         {loop.map((e, i) => (
           <button key={`${e.id}-${i}`} className="ticker-item" onClick={() => onSelect(e.id)}>
             <span className="cdot" style={{ background: `var(${CATEGORIES[e.category].token})` }} />
-            <b>{e.country}</b> {e.title} <span className="ticker-ago">{ago(e.timestamp)}</span>
+            <b style={{ marginRight: 5 }}>{e.country}</b> {e.title} <span className="ticker-ago">{ago(e.timestamp)}</span>
           </button>
         ))}
       </div>

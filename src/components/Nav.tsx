@@ -39,7 +39,7 @@ export function Nav({ children }: { children?: React.ReactNode }) {
 
   return (
     <nav className="nav">
-      <Link href="/" className="brand" style={{ textDecoration: "none" }}>
+      <Link href="/" className="brand" style={{ textDecoration: "none" }} title="Real-time insights across the Muslim world">
         <span className="mark"><StarMark /></span>
         <h1>UmmahMonitor</h1>
       </Link>

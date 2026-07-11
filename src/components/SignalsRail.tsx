@@ -46,6 +46,9 @@ export function SignalsRail({
           <h3 title="Composite of Safety, Humanitarian, Worship &amp; Economy indicators (0–100, higher = more severe)">Situation Index</h3>
           <span className="tag">{countries.length} countries</span>
         </div>
+        <p style={{ fontSize: 11, color: "var(--faint)", margin: "-4px 0 10px", lineHeight: 1.4 }}>
+          Composite score (0–100) from conflict, humanitarian need, disaster impact &amp; verified developments.
+        </p>
         {topCountries.map((c) => (
           <button key={c.name} className="idx" onClick={() => onSelectCountry(c)}>
             <span className="sd" style={{ background: `var(${scoreToken(c.score)})` }} />

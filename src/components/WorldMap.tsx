@@ -109,7 +109,12 @@ export const WorldMap = forwardRef<WorldMapHandle, {
   const camRef = useRef({ lon: 34, lat: 26, zoom: 1.35 });
   const dragRef = useRef<{ x: number; y: number; lon: number; lat: number } | null>(null);
   const hitRef = useRef<{ x: number; y: number; r: number; id: number }[]>([]);
-  const [hover, setHover] = useState<{ x: number; y: number; title: string } | null>(null);
+  const countryHitRef = useRef<{ x: number; y: number; r: number; name: string }[]>([]);
+  const [hover, setHover] = useState<
+    | { kind: "event"; x: number; y: number; title: string }
+    | { kind: "country"; x: number; y: number; name: string; score: number; activeCount: number; latestTitle: string | null }
+    | null
+  >(null);
   const dataRef = useRef({ events, countries, layers, selectedId, quakes, flights });
   dataRef.current = { events, countries, layers, selectedId, quakes, flights };
 
@@ -381,6 +386,7 @@ export const WorldMap = forwardRef<WorldMapHandle, {
       // pressure rings + country name labels
       if (layers.pressure) {
         const textCol = resolveVar("--text");
+        countryHitRef.current = [];
         for (const c of countries) {
           const p = project(c.pos[0], c.pos[1], w, h);
           const radius = 8 + (c.score / 100) * 34;
@@ -393,6 +399,7 @@ export const WorldMap = forwardRef<WorldMapHandle, {
           ctx.stroke();
           ctx.fillStyle = withAlpha(col, 0.06);
           ctx.fill();
+          countryHitRef.current.push({ x: p.x, y: p.y, r: radius, name: c.name });
 
           if (p.x > -60 && p.x < w + 60 && p.y > -20 && p.y < h + 20) {
             ctx.font = "600 11px Inter, sans-serif";
@@ -485,8 +492,8 @@ export const WorldMap = forwardRef<WorldMapHandle, {
       return;
     }
 
-    // Hover hit-test (only when not dragging) — reuses the same hitRef
-    // circles the click handler uses, so hover always matches what's clickable.
+    // Hover hit-test (only when not dragging). Events take priority — they're
+    // smaller, more specific targets sitting on top of the larger country rings.
     let best: { id: number; dist: number } | null = null;
     for (const h of hitRef.current) {
       const dist = Math.hypot(h.x - mx, h.y - my);
@@ -494,10 +501,31 @@ export const WorldMap = forwardRef<WorldMapHandle, {
     }
     if (best) {
       const ev = dataRef.current.events.find((e2) => e2.id === best!.id);
-      setHover(ev ? { x: mx, y: my, title: ev.title } : null);
-    } else if (hover) {
-      setHover(null);
+      setHover(ev ? { kind: "event", x: mx, y: my, title: ev.title } : null);
+      return;
     }
+
+    let bestCountry: { name: string; dist: number } | null = null;
+    for (const h of countryHitRef.current) {
+      const dist = Math.hypot(h.x - mx, h.y - my);
+      if (dist <= h.r && (!bestCountry || dist < bestCountry.dist)) bestCountry = { name: h.name, dist };
+    }
+    if (bestCountry) {
+      const country = dataRef.current.countries.find((c) => c.name === bestCountry!.name);
+      if (country) {
+        const countryEvents = dataRef.current.events.filter((e) => e.country === country.name);
+        const latest = countryEvents.reduce<(typeof countryEvents)[number] | null>(
+          (acc, e) => (!acc || e.timestamp > acc.timestamp ? e : acc),
+          null,
+        );
+        setHover({
+          kind: "country", x: mx, y: my, name: country.name, score: country.score,
+          activeCount: countryEvents.length, latestTitle: latest?.title ?? null,
+        });
+        return;
+      }
+    }
+    if (hover) setHover(null);
   }
   function onUp(e: React.MouseEvent) {
     const d = dragRef.current;
@@ -530,7 +558,7 @@ export const WorldMap = forwardRef<WorldMapHandle, {
         onWheel={onWheel}
         style={{ cursor: hover ? "pointer" : "grab" }}
       />
-      {hover && (
+      {hover && hover.kind === "event" && (
         <div
           style={{
             position: "absolute", left: hover.x + 14, top: hover.y + 14,
@@ -541,6 +569,32 @@ export const WorldMap = forwardRef<WorldMapHandle, {
           }}
         >
           {hover.title}
+        </div>
+      )}
+      {hover && hover.kind === "country" && (
+        <div
+          style={{
+            position: "absolute", left: hover.x + 14, top: hover.y + 14,
+            pointerEvents: "none", zIndex: 30, width: 220,
+            background: "var(--panel-solid)", border: "1px solid var(--stroke2)",
+            borderRadius: 10, padding: "10px 12px", fontSize: 12.5,
+            color: "var(--text)", boxShadow: "var(--shadow)",
+          }}
+        >
+          <div style={{ fontWeight: 700, marginBottom: 4 }}>{hover.name}</div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "var(--muted)", marginBottom: 3 }}>
+            <span>Situation Index</span>
+            <span className="mono" style={{ color: "var(--text)" }}>{hover.score}</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "var(--muted)", marginBottom: hover.latestTitle ? 6 : 0 }}>
+            <span>Active events</span>
+            <span className="mono" style={{ color: "var(--text)" }}>{hover.activeCount}</span>
+          </div>
+          {hover.latestTitle && (
+            <div style={{ fontSize: 11, color: "var(--faint)", borderTop: "1px solid var(--stroke)", paddingTop: 6, lineHeight: 1.4 }}>
+              Latest: {hover.latestTitle}
+            </div>
+          )}
         </div>
       )}
     </div>
