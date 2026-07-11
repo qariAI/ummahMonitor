@@ -752,3 +752,5 @@
 .viz-tooltip-line { font-size: 10px; fill: var(--muted); }
 .viz-tile-title { font-size: 12px; fill: var(--text); font-weight: 700; pointer-events: none; }
 .viz-tile-sub { font-size: 10px; fill: var(--muted); pointer-events: none; }
+.viz-source-link { display: inline-block; margin-top: 8px; font-size: 10.5px; color: var(--faint); text-decoration: none; }
+.viz-source-link:hover { color: var(--faith); }
