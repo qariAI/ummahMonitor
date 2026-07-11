@@ -29,7 +29,7 @@ export function MapView({
   const [events, setEvents] = useState(initialEvents);
   const [range, setRange] = useState<Range>("all");
   const [active, setActive] = useState<Record<CategoryKey, boolean>>({
-    faith: true, community: true, humanitarian: true, conflict: true, economy: true, education: true,
+    faith: true, community: true, humanitarian: true, conflict: true, economy: true, education: true, good_news: true,
   });
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [layers, setLayers] = useState<MapLayers>({
