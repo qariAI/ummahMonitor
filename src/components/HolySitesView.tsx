@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Nav } from "./Nav";
-import { CATEGORIES, ago, api, severityToken } from "@/lib/client";
+import { CATEGORIES, ago, api, severityIcon, severityToken } from "@/lib/client";
 import type { HolySiteData } from "@/app/api/holy-sites/route";
 
 function LiveClock({ timezone }: { timezone: string }) {
@@ -73,7 +73,7 @@ function SiteCard({ site }: { site: HolySiteData }) {
               className="sev"
               style={{ background: `color-mix(in srgb, var(${severityToken(e.severity)}) 18%, transparent)`, color: `var(${severityToken(e.severity)})`, flex: "none" }}
             >
-              {e.severity}
+              {severityIcon(e.severity)} {e.severity}
             </span>
             <span className="mono" style={{ color: "var(--faint)", fontSize: 10.5, flex: "none" }}>{ago(e.timestamp)}</span>
           </Link>

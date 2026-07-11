@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Nav } from "@/components/Nav";
 import { AuthModal } from "@/components/AuthModal";
 import { useAuth, useToast } from "@/components/Providers";
-import { api, CATEGORIES, ago, severityToken } from "@/lib/client";
+import { api, CATEGORIES, ago, severityIcon, severityToken } from "@/lib/client";
 import type { EventDTO } from "@/lib/repos";
 
 function EventRow({ e }: { e: EventDTO }) {
@@ -20,7 +20,7 @@ function EventRow({ e }: { e: EventDTO }) {
         className="sev"
         style={{ background: `color-mix(in srgb, var(${severityToken(e.severity)}) 18%, transparent)`, color: `var(${severityToken(e.severity)})` }}
       >
-        {e.severity}
+        {severityIcon(e.severity)} {e.severity}
       </span>
       <span className="mono" style={{ color: "var(--faint)", fontSize: 10.5 }}>{ago(e.timestamp)}</span>
     </Link>

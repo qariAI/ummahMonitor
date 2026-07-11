@@ -1,5 +1,5 @@
 import { listEvents } from "@/lib/repos";
-import { CATEGORIES, ago, severityToken } from "@/lib/client";
+import { CATEGORIES, ago, severityIcon, severityToken } from "@/lib/client";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +39,7 @@ export default async function MobilePage() {
                   className="sev"
                   style={{ background: `color-mix(in srgb, var(${severityToken(e.severity)}) 18%, transparent)`, color: `var(${severityToken(e.severity)})` }}
                 >
-                  {e.severity}
+                  {severityIcon(e.severity)} {e.severity}
                 </span>
                 <span>{e.country}</span>
                 <span>· {ago(e.timestamp)}</span>

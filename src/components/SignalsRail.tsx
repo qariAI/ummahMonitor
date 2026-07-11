@@ -13,7 +13,7 @@ function scoreToken(score: number): string {
 
 const STATUS_LABEL: Record<string, string> = { active: "active", strained: "strained", closed: "closed" };
 
-// Right-side "Signals" rail: Community Pressure Index (real country scores),
+// Right-side "Signals" rail: Situation Index (real country scores),
 // Crisis Tracker (real events, filtered to humanitarian/high-severity
 // conflict), and Aid Corridors. Corridors are illustrative/hardcoded — no
 // real schema exists for them yet (see design handoff README).
@@ -43,7 +43,7 @@ export function SignalsRail({
 
       <div className="pnl">
         <div className="pnl-hd">
-          <h3>Community Pressure Index</h3>
+          <h3>Situation Index</h3>
           <span className="tag">{countries.length} countries</span>
         </div>
         {topCountries.map((c) => (

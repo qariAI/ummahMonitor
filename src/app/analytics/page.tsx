@@ -92,7 +92,7 @@ export default async function AnalyticsPage() {
           </div>
 
           <div className="card">
-            <h3>Top movers · community pressure</h3>
+            <h3>Top movers · situation index</h3>
             {movers.map((c) => (
               <div key={c.name} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 0" }}>
                 <span style={{ fontSize: 16 }}>{c.flag}</span>

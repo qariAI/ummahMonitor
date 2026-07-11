@@ -20,7 +20,7 @@ export interface BriefResult {
 
 function buildPrompt(event: EventDTO, country: CountryDTO | null): string {
   const ctx = country
-    ? ` (community pressure index ${country.score}/100, trend ${country.trend})`
+    ? ` (situation index ${country.score}/100, trend ${country.trend})`
     : "";
   return [
     "You are the analyst engine for UmmahMonitor, a live situational dashboard for the global Muslim community (the Ummah).",

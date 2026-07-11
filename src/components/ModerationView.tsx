@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { ModerationDTO } from "@/lib/repos";
-import { CATEGORIES, ago, api, severityToken, trustScoreToken, type CategoryKey } from "@/lib/client";
+import { CATEGORIES, ago, api, severityIcon, severityToken, trustScoreToken, type CategoryKey } from "@/lib/client";
 import { Nav } from "./Nav";
 import { useAuth, useToast } from "./Providers";
 import { AuthModal } from "./AuthModal";
@@ -129,7 +129,7 @@ export function ModerationView() {
                   <span className="cdot" style={{ width: 8, height: 8, borderRadius: "50%", background: `var(${CATEGORIES[it.category].token})` }} />
                   <span className="mono" style={{ fontSize: 10.5, color: "var(--muted)" }}>{it.country}</span>
                   <span className="sev" style={{ marginLeft: "auto", background: `color-mix(in srgb, var(${severityToken(it.severity)}) 18%, transparent)`, color: `var(${severityToken(it.severity)})` }}>
-                    {it.severity}
+                    {severityIcon(it.severity)} {it.severity}
                   </span>
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.35, marginBottom: 8 }}>{it.title}</div>
@@ -156,7 +156,7 @@ export function ModerationView() {
               <div className="dt-top">
                 <span className="cat-dot" style={{ background: `var(${CATEGORIES[sel.category].token})` }} />
                 {CATEGORIES[sel.category].label} · {sel.country}
-                <span className="sev" style={{ background: `color-mix(in srgb, var(${severityToken(sel.severity)}) 18%, transparent)`, color: `var(${severityToken(sel.severity)})` }}>{sel.severity}</span>
+                <span className="sev" style={{ background: `color-mix(in srgb, var(${severityToken(sel.severity)}) 18%, transparent)`, color: `var(${severityToken(sel.severity)})` }}>{severityIcon(sel.severity)} {sel.severity}</span>
               </div>
               <h2 style={{ fontFamily: "var(--display)", fontSize: 24, margin: "10px 0 4px" }}>{sel.title}</h2>
               <div className="mono" style={{ fontSize: 11, color: "var(--faint)" }}>

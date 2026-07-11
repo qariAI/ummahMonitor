@@ -29,7 +29,7 @@ export default async function CountryPage({ params }: { params: Promise<{ name: 
 
         <div className="card-grid">
           <div className="card">
-            <h3>Community Pressure Index</h3>
+            <h3>Situation Index</h3>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <div className="score-num" style={{ color: `var(${scoreColorToken(country.score)})`, fontSize: 52 }}>{country.score}</div>
               <div>

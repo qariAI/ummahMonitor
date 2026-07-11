@@ -7,6 +7,7 @@ import {
   ago,
   api,
   scoreColorToken,
+  severityIcon,
   severityToken,
   trendGlyph,
 } from "@/lib/client";
@@ -340,7 +341,7 @@ function Respond({ event }: { event: EventDTO }) {
 
   return (
     <div className="sect">
-      <h4>Respond</h4>
+      <h4>How can I help?</h4>
       <div className="rphase">
         {PHASES.map((p, i) => {
           const on = i === ci;
@@ -473,7 +474,7 @@ export function Dossier({
             <span className="cat-dot" style={{ background: `var(${CATEGORIES[event.category].token})` }} />
             {CATEGORIES[event.category].label}
             <span className="sev" style={{ background: `color-mix(in srgb, var(${severityToken(event.severity)}) 18%, transparent)`, color: `var(${severityToken(event.severity)})` }}>
-              {event.severity}
+              {severityIcon(event.severity)} {event.severity}
             </span>
             <span>· {ago(event.timestamp)}</span>
             <span style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
@@ -496,7 +497,7 @@ export function Dossier({
                     {country.score}
                   </div>
                   <div className="score-meta">
-                    <div className="lbl">Community Pressure</div>
+                    <div className="lbl">Situation Index</div>
                     <div className="dl">
                       {country.name} · rank {country.rank} of {country.totalCountries}
                     </div>

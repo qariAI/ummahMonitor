@@ -241,12 +241,12 @@
   color: var(--conflict);
 }
 .ticker-label .live-dot { background: var(--conflict); }
-.crypto-ticker { top: 86px; } /* stacks directly under the 32px-tall events ticker (top: 54px) */
-.ticker-label.crypto {
-  background: color-mix(in srgb, var(--economy) 16%, transparent);
-  color: var(--economy);
+.ummah-ticker { top: 86px; } /* stacks directly under the 32px-tall events ticker (top: 54px) */
+.ticker-label.ummah {
+  background: color-mix(in srgb, var(--faith) 16%, transparent);
+  color: var(--faith);
 }
-.ticker-label.crypto .live-dot { background: var(--economy); }
+.ticker-label.ummah .live-dot { background: var(--faith); }
 .ticker-scroll { display: flex; gap: 38px; white-space: nowrap; animation: ticker-scroll 60s linear infinite; padding-left: 38px; }
 .ticker:hover .ticker-scroll { animation-play-state: paused; }
 @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }

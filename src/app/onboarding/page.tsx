@@ -137,7 +137,7 @@ export default function OnboardingPage() {
     // Skip collects nothing — clear local selections so the completion
     // screen's summary reflects that ("None selected" / "Worldwide"),
     // not whatever the step defaults happened to be.
-    setCats({ faith: false, community: false, humanitarian: false, conflict: false, economy: false, education: false, good_news: false });
+    setCats({ faith: false, community: false, humanitarian: false, conflict: false, economy: false, education: false });
     setRegions({ mena: false, africa: false, southasia: false, seasia: false, centralasia: false, euramericas: false, eastafrica: false });
     setSeverity("high");
     await persist("high", [], []);

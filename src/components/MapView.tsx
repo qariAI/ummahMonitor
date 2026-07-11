@@ -2,16 +2,15 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CountryDTO, EventDTO } from "@/lib/repos";
-import { CATEGORIES, ago, api, severityToken, type CategoryKey } from "@/lib/client";
+import { CATEGORIES, ago, api, severityIcon, severityToken, type CategoryKey } from "@/lib/client";
 import { Nav } from "./Nav";
 import { WorldMap, type MapLayers, type WorldMapHandle } from "./WorldMap";
 import type { QuakeMarker } from "@/lib/liveQuakes";
 import type { FlightMarker } from "@/lib/liveFlights";
-import type { CryptoTicker as CryptoTickerData } from "@/app/api/live/crypto/route";
+import { UmmahTicker } from "./UmmahTicker";
 import { Dossier } from "./Dossier";
 import { SubmitReport } from "./SubmitReport";
 import { Ticker } from "./Ticker";
-import { CryptoTicker } from "./CryptoTicker";
 import { SignalsRail } from "./SignalsRail";
 import { useAuth } from "./Providers";
 
@@ -40,7 +39,6 @@ export function MapView({
   const [submitOpen, setSubmitOpen] = useState(false);
   const [quakes, setQuakes] = useState<QuakeMarker[]>([]);
   const [flights, setFlights] = useState<FlightMarker[]>([]);
-  const [tickers, setTickers] = useState<CryptoTickerData[]>([]);
   const mapRef = useRef<WorldMapHandle>(null);
 
   // Poll the live layers independently — quakes refresh slowly (USGS is
@@ -70,19 +68,6 @@ export function MapView({
     }
     pollFlights();
     const id = setInterval(pollFlights, 30_000);
-    return () => { stop = true; clearInterval(id); };
-  }, []);
-
-  useEffect(() => {
-    let stop = false;
-    async function pollCrypto() {
-      try {
-        const r = await api<{ tickers: CryptoTickerData[] }>("/api/live/crypto");
-        if (!stop) setTickers(r.tickers);
-      } catch {}
-    }
-    pollCrypto();
-    const id = setInterval(pollCrypto, 60_000);
     return () => { stop = true; clearInterval(id); };
   }, []);
 
@@ -138,16 +123,10 @@ export function MapView({
       </Nav>
 
       <Ticker events={filtered} onSelect={setSelectedId} />
-      <CryptoTicker tickers={tickers} />
+      <UmmahTicker events={events} countries={countries} />
 
       <div
-        className={`map-screen${
-          filtered.length && tickers.length
-            ? " with-two-tickers"
-            : filtered.length || tickers.length
-              ? " with-ticker"
-              : ""
-        }`}
+        className={`map-screen${filtered.length ? " with-two-tickers" : " with-ticker"}`}
       >
         <WorldMap
           ref={mapRef}
@@ -194,7 +173,7 @@ export function MapView({
                       className="sev"
                       style={{ background: `color-mix(in srgb, var(${severityToken(e.severity)}) 18%, transparent)`, color: `var(${severityToken(e.severity)})` }}
                     >
-                      {e.severity}
+                      {severityIcon(e.severity)} {e.severity}
                     </span>
                     <span>{e.country}</span>
                     <span>· {ago(e.timestamp)}</span>

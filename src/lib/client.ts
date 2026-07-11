@@ -64,6 +64,11 @@ export function severityToken(sev: string): string {
       : "--faith";
 }
 
+/** Severity → colored-dot emoji, for scannable badges instead of tiny text-only labels. */
+export function severityIcon(sev: string): string {
+  return sev === "critical" ? "🔴" : sev === "high" ? "🟠" : sev === "medium" ? "🟡" : "🟢";
+}
+
 export function scoreColorToken(score: number): string {
   return score >= 75 ? "--conflict" : score >= 50 ? "--humanitarian" : score >= 30 ? "--economy" : "--faith";
 }
