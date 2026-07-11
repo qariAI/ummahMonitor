@@ -7,7 +7,8 @@ import { Nav } from "./Nav";
 import { WorldMap, type MapLayers, type WorldMapHandle } from "./WorldMap";
 import type { QuakeMarker } from "@/lib/liveQuakes";
 import type { FlightMarker } from "@/lib/liveFlights";
-import { UmmahTicker } from "./UmmahTicker";
+import { StatsBar } from "./StatsBar";
+import { MapSummaryWidget } from "./MapSummaryWidget";
 import { Dossier } from "./Dossier";
 import { SubmitReport } from "./SubmitReport";
 import { Ticker } from "./Ticker";
@@ -123,7 +124,7 @@ export function MapView({
       </Nav>
 
       <Ticker events={filtered} onSelect={setSelectedId} />
-      <UmmahTicker events={events} countries={countries} />
+      <StatsBar events={events} countries={countries} />
 
       <div
         className={`map-screen${filtered.length ? " with-two-tickers" : " with-ticker"}`}
@@ -162,7 +163,7 @@ export function MapView({
             {filtered.map((e) => (
               <div
                 key={e.id}
-                className={`ev${e.id === selectedId ? " sel" : ""}`}
+                className={`ev sev-${e.severity}${e.id === selectedId ? " sel" : ""}`}
                 onClick={() => setSelectedId(e.id)}
               >
                 <span className="cdot" style={{ background: `var(${CATEGORIES[e.category].token})` }} />
@@ -204,6 +205,8 @@ export function MapView({
             ))}
           </div>
         )}
+
+        <MapSummaryWidget events={filtered} countries={countries} quakes={quakes} flights={flights} />
 
         <SignalsRail
           countries={countries}

@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import type { CountryDTO, EventDTO } from "@/lib/repos";
 import { CATEGORIES, resolveVar, severityToken } from "@/lib/client";
 import type { QuakeMarker } from "@/lib/liveQuakes";
@@ -109,6 +109,7 @@ export const WorldMap = forwardRef<WorldMapHandle, {
   const camRef = useRef({ lon: 34, lat: 26, zoom: 1.35 });
   const dragRef = useRef<{ x: number; y: number; lon: number; lat: number } | null>(null);
   const hitRef = useRef<{ x: number; y: number; r: number; id: number }[]>([]);
+  const [hover, setHover] = useState<{ x: number; y: number; title: string } | null>(null);
   const dataRef = useRef({ events, countries, layers, selectedId, quakes, flights });
   dataRef.current = { events, countries, layers, selectedId, quakes, flights };
 
@@ -470,12 +471,33 @@ export const WorldMap = forwardRef<WorldMapHandle, {
   }
   function onMove(e: React.MouseEvent) {
     const d = dragRef.current;
-    if (!d) return;
     const canvas = canvasRef.current!;
-    const scale = Math.min(canvas.clientWidth / 360, canvas.clientHeight / 190) * camRef.current.zoom;
-    camRef.current.lon = d.lon - (e.clientX - d.x) / scale;
-    camRef.current.lat = d.lat + (e.clientY - d.y) / scale;
-    camRef.current.lat = Math.max(-70, Math.min(82, camRef.current.lat));
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    if (d) {
+      const scale = Math.min(canvas.clientWidth / 360, canvas.clientHeight / 190) * camRef.current.zoom;
+      camRef.current.lon = d.lon - (e.clientX - d.x) / scale;
+      camRef.current.lat = d.lat + (e.clientY - d.y) / scale;
+      camRef.current.lat = Math.max(-70, Math.min(82, camRef.current.lat));
+      if (hover) setHover(null); // don't show a tooltip while panning
+      return;
+    }
+
+    // Hover hit-test (only when not dragging) — reuses the same hitRef
+    // circles the click handler uses, so hover always matches what's clickable.
+    let best: { id: number; dist: number } | null = null;
+    for (const h of hitRef.current) {
+      const dist = Math.hypot(h.x - mx, h.y - my);
+      if (dist <= h.r && (!best || dist < best.dist)) best = { id: h.id, dist };
+    }
+    if (best) {
+      const ev = dataRef.current.events.find((e2) => e2.id === best!.id);
+      setHover(ev ? { x: mx, y: my, title: ev.title } : null);
+    } else if (hover) {
+      setHover(null);
+    }
   }
   function onUp(e: React.MouseEvent) {
     const d = dragRef.current;
@@ -504,10 +526,23 @@ export const WorldMap = forwardRef<WorldMapHandle, {
         onMouseDown={onDown}
         onMouseMove={onMove}
         onMouseUp={onUp}
-        onMouseLeave={() => (dragRef.current = null)}
+        onMouseLeave={() => { dragRef.current = null; setHover(null); }}
         onWheel={onWheel}
-        style={{ cursor: "grab" }}
+        style={{ cursor: hover ? "pointer" : "grab" }}
       />
+      {hover && (
+        <div
+          style={{
+            position: "absolute", left: hover.x + 14, top: hover.y + 14,
+            pointerEvents: "none", zIndex: 30, maxWidth: 240,
+            background: "var(--panel-solid)", border: "1px solid var(--stroke2)",
+            borderRadius: 8, padding: "6px 10px", fontSize: 12.5,
+            color: "var(--text)", boxShadow: "var(--shadow)",
+          }}
+        >
+          {hover.title}
+        </div>
+      )}
     </div>
   );
 });

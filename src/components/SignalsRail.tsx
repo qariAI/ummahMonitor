@@ -43,7 +43,7 @@ export function SignalsRail({
 
       <div className="pnl">
         <div className="pnl-hd">
-          <h3>Situation Index</h3>
+          <h3 title="Composite of Safety, Humanitarian, Worship &amp; Economy indicators (0–100, higher = more severe)">Situation Index</h3>
           <span className="tag">{countries.length} countries</span>
         </div>
         {topCountries.map((c) => (

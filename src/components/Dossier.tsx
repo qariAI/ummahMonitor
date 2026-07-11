@@ -497,7 +497,7 @@ export function Dossier({
                     {country.score}
                   </div>
                   <div className="score-meta">
-                    <div className="lbl">Situation Index</div>
+                    <div className="lbl" title="Composite of Safety, Humanitarian, Worship &amp; Economy indicators (0–100, higher = more severe)">Situation Index</div>
                     <div className="dl">
                       {country.name} · rank {country.rank} of {country.totalCountries}
                     </div>

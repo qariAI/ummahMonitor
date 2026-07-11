@@ -115,7 +115,11 @@
   color: var(--muted);
   transition: all 0.18s;
 }
-.range-ctl button.on { background: var(--panel-solid); color: var(--text); }
+.range-ctl button.on {
+  background: color-mix(in srgb, var(--faith) 16%, var(--panel-solid));
+  color: var(--faith);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--faith) 40%, transparent);
+}
 .avatar {
   width: 34px;
   height: 34px;
@@ -241,12 +245,26 @@
   color: var(--conflict);
 }
 .ticker-label .live-dot { background: var(--conflict); }
-.ummah-ticker { top: 86px; } /* stacks directly under the 32px-tall events ticker (top: 54px) */
-.ticker-label.ummah {
-  background: color-mix(in srgb, var(--faith) 16%, transparent);
-  color: var(--faith);
+
+/* Static 3-card stats bar — replaces the old scrolling second ticker.
+   Same height/position (top: 86px, 32px tall) so map-screen sizing below
+   doesn't need to change. */
+.stats-bar {
+  position: sticky;
+  top: 86px;
+  height: 32px;
+  z-index: 38;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 0 16px;
+  background: var(--panel-solid);
+  border-bottom: 1px solid var(--stroke);
 }
-.ticker-label.ummah .live-dot { background: var(--faith); }
+.stat-card { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+.stat-icon { font-size: 13px; }
+.stat-num { font-family: var(--mono); font-weight: 700; color: var(--text); }
+.stat-lbl { color: var(--faint); }
 .ticker-scroll { display: flex; gap: 38px; white-space: nowrap; animation: ticker-scroll 60s linear infinite; padding-left: 38px; }
 .ticker:hover .ticker-scroll { animation-play-state: paused; }
 @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
@@ -308,12 +326,27 @@
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background 0.15s;
+  animation: ev-in 0.35s ease both;
 }
+@keyframes ev-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) { .ev { animation: none; } }
 .ev:hover { background: var(--bg2); }
 .ev.sel { background: color-mix(in srgb, var(--faith) 8%, var(--bg2)); }
 .ev .cdot { width: 9px; height: 9px; border-radius: 50%; margin-top: 5px; flex: none; }
 .ev .ev-body { min-width: 0; flex: 1; }
-.ev h3 { font-size: 13px; font-weight: 600; line-height: 1.4; margin: 0 0 3px; }
+.ev h3 { font-size: 13px; font-weight: 600; line-height: 1.5; margin: 0 0 4px; }
+
+/* Visual hierarchy by severity — critical/high stories get more breathing
+   room and an accent edge, so the feed reads by importance, not just order. */
+.ev.sev-critical { padding: 16px 11px; border-left: 3px solid var(--conflict); margin-bottom: 2px; }
+.ev.sev-critical h3 { font-size: 14.5px; }
+.ev.sev-high { padding: 13px 11px; border-left: 2px solid var(--conflict); }
+.ev.sev-high h3 { font-size: 13.5px; }
+.ev.sev-medium, .ev.sev-low { padding: 9px 11px; }
+.ev.sev-medium h3, .ev.sev-low h3 { font-size: 12.5px; opacity: 0.92; }
 .ev .ev-meta {
   font-family: var(--mono);
   font-size: 10.5px;
