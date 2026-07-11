@@ -178,3 +178,16 @@ model Briefing {
 
   @@index([scope, generatedAt])
 }
+
+// Per-user daily message counter for /api/chat — this is the first AI
+// endpoint in the app that actually enforces a rate limit server-side,
+// closing (for this one route) the "no rate limiting on AI endpoints" gap
+// flagged since the original launch audit. One row per user per UTC day.
+model ChatUsage {
+  id     String @id @default(cuid())
+  userId String
+  date   String // "YYYY-MM-DD", UTC
+  count  Int    @default(0)
+
+  @@unique([userId, date])
+}

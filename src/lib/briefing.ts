@@ -26,16 +26,29 @@ export interface BriefingResult {
   generatedAt: number;
 }
 
+function scopeDescription(scope: string): { line: string; balanced: boolean } {
+  if (scope === "global") return { line: "across the whole Muslim world (the Ummah)", balanced: true };
+  if (scope === "category:humanitarian") return { line: "on humanitarian developments specifically", balanced: false };
+  if (scope === "category:conflict") return { line: "on conflict and security developments specifically", balanced: false };
+  if (scope === "category:economy") return { line: "on economic and financial developments specifically", balanced: false };
+  if (scope === "category:good_news") return { line: "on positive, uplifting developments specifically", balanced: false };
+  if (scope === "climate") return { line: "on climate, environment, and disaster-related developments specifically", balanced: false };
+  return { line: `specifically in ${scope}`, balanced: true };
+}
+
 function buildPrompt(scope: string, events: EventDTO[]): string {
   const lines = events
     .slice(0, 30)
     .map((e) => `- [${e.category}/${e.severity}] ${e.country}: ${e.title}`)
     .join("\n");
-  const scopeLine = scope === "global" ? "across the whole Muslim world (the Ummah)" : `specifically in ${scope}`;
+  const { line: scopeLine, balanced } = scopeDescription(scope);
+  const balanceInstruction = balanced
+    ? "Aim for a balanced mix, not a wall of bad news: prioritize humanitarian developments, faith/community milestones, and any genuinely positive/good-news items alongside conflict or emergency items. Don't let conflict dominate every bullet if calmer or positive items exist in the data below — but never invent a positive item that isn't in the data."
+    : "This is a focused segment on one topic area — stay on-topic rather than trying to balance across categories.";
   return [
     "You are the daily briefing analyst for UmmahMonitor, a live situational dashboard for the global Muslim community.",
     `Write a concise briefing ${scopeLine}, synthesizing the verified events below into 4-6 short bullet points.`,
-    "Aim for a balanced mix, not a wall of bad news: prioritize humanitarian developments, faith/community milestones, and any genuinely positive/good-news items alongside conflict or emergency items. Don't let conflict dominate every bullet if calmer or positive items exist in the data below — but never invent a positive item that isn't in the data.",
+    balanceInstruction,
     "Each bullet: one sentence, factual, no editorializing, no markdown, no emoji.",
     "Respond ONLY as a JSON array of strings, nothing else — no preamble, no code fences.",
     "",

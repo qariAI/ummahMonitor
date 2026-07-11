@@ -16,6 +16,8 @@ function StarMark() {
 
 const BASE_LINKS = [
   { href: "/", label: "Map" },
+  { href: "/chat", label: "Chat" },
+  { href: "/broadcast", label: "Broadcast" },
   { href: "/data", label: "Data Intelligence" },
   { href: "/stories", label: "Stories" },
   { href: "/dashboard", label: "Dashboard" },
