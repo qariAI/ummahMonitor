@@ -17,6 +17,7 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const CATEGORIES = {
+  good_news: { label: "Good News", token: "--good-news" },
   faith: { label: "Faith", token: "--faith" },
   community: { label: "Community", token: "--community" },
   humanitarian: { label: "Humanitarian", token: "--humanitarian" },

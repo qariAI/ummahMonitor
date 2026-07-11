@@ -131,6 +131,60 @@ export async function getEvent(id: number): Promise<EventDTO | null> {
   return attachTrust(toEventRecord(row));
 }
 
+// ── Saved events (bookmarks) ─────────────────────────────────────────────
+
+export async function saveEvent(userId: string, eventId: number): Promise<void> {
+  // Upsert-like: unique(userId, eventId) means a repeat save is a silent no-op.
+  await prisma.savedEvent.upsert({
+    where: { userId_eventId: { userId, eventId } },
+    create: { userId, eventId },
+    update: {},
+  });
+}
+
+export async function unsaveEvent(userId: string, eventId: number): Promise<void> {
+  await prisma.savedEvent.deleteMany({ where: { userId, eventId } });
+}
+
+export async function listSavedEventIds(userId: string): Promise<number[]> {
+  const rows = await prisma.savedEvent.findMany({ where: { userId }, select: { eventId: true } });
+  return rows.map((r) => r.eventId);
+}
+
+export async function listSavedEvents(userId: string): Promise<EventDTO[]> {
+  const rows = await prisma.savedEvent.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    include: { event: { include: { sources: true } } },
+  });
+  // Saved events remain visible to the user who saved them even if they were
+  // later withheld/rejected — a save is a personal record, not a publish
+  // decision, so this deliberately skips the publicOnly trust filter that
+  // listEvents applies.
+  return rows.map((r) => attachTrust(toEventRecord(r.event)));
+}
+
+// ── Followed countries ───────────────────────────────────────────────────
+
+export async function getFollowedCountries(userId: string): Promise<string[]> {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { followedCountries: true } });
+  return j<string[]>(user?.followedCountries ?? null, []);
+}
+
+export async function followCountry(userId: string, country: string): Promise<string[]> {
+  const current = await getFollowedCountries(userId);
+  const next = current.includes(country) ? current : [...current, country];
+  await prisma.user.update({ where: { id: userId }, data: { followedCountries: JSON.stringify(next) } });
+  return next;
+}
+
+export async function unfollowCountry(userId: string, country: string): Promise<string[]> {
+  const current = await getFollowedCountries(userId);
+  const next = current.filter((c) => c !== country);
+  await prisma.user.update({ where: { id: userId }, data: { followedCountries: JSON.stringify(next) } });
+  return next;
+}
+
 // ── Countries ─────────────────────────────────────────────────────────────
 
 export async function listCountries(): Promise<CountryDTO[]> {

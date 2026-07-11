@@ -15,6 +15,7 @@ function markOnboardingSeen() {
 const ROLES = ["Researcher", "Journalist", "NGO worker", "Community leader", "Student", "Other"];
 
 const CAT_META: Record<CategoryKey, { desc: string; count: number }> = {
+  good_news: { desc: "Conversions, new masjids, milestones, hope", count: 29 },
   faith: { desc: "Worship, scholarship, pilgrimage, rulings", count: 84 },
   community: { desc: "Culture, diaspora, education, youth", count: 61 },
   humanitarian: { desc: "Relief, refugees, disaster response", count: 73 },

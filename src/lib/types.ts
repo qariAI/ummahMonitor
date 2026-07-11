@@ -8,7 +8,8 @@ export type Category =
   | "humanitarian"
   | "conflict"
   | "economy"
-  | "education";
+  | "education"
+  | "good_news";
 
 export type Severity = "low" | "medium" | "high" | "critical";
 

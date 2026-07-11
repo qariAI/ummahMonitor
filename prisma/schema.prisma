@@ -46,6 +46,7 @@ model Event {
   // shared confidence service (never stored, always recomputed).
   confidenceOverride Int?
   sources     Source[]
+  savedBy     SavedEvent[]
 
   @@index([category])
   @@index([pending])
@@ -107,10 +108,13 @@ model User {
   onboarded  Boolean @default(false)
   role       String?
   categories String? // JSON array of category keys
-  regions    String? // JSON array of region keys
+  regions    String? // JSON array of region keys (broad groups, e.g. "mena")
+  followedCountries String? // JSON array of specific country names, e.g. ["Sudan","Palestine"]
   severity   String  @default("high") // all | medium | high | critical
   digest     String  @default("daily") // real-time | hourly | daily | weekly
   channels   String? // JSON: { inapp, email, whatsapp }
+
+  savedEvents SavedEvent[]
 }
 
 // Server-side session persistence — opaque token stored hashed, matched to a
@@ -123,6 +127,21 @@ model Session {
   createdAt DateTime @default(now())
   expiresAt DateTime
 
+  @@index([userId])
+}
+
+// A user bookmarking an event — the "Save events" feature. Deliberately a
+// thin join table (no extra fields yet) so it's cheap to query in both
+// directions: "did this user save this event" and "all events this user saved".
+model SavedEvent {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId   Int
+  createdAt DateTime @default(now())
+
+  @@unique([userId, eventId])
   @@index([userId])
 }
 

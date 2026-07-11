@@ -11,7 +11,7 @@ import {
   trendGlyph,
 } from "@/lib/client";
 import { GiveSheet } from "./GiveSheet";
-import { useToast } from "./Providers";
+import { useAuth, useToast } from "./Providers";
 import type { ContextEvent, ContextQuake, ContextFlight } from "@/app/api/context/route";
 
 function initials(name: string): string {
@@ -277,6 +277,60 @@ const PHASES: [string, string, string][] = [
   ["recovery", "Recovery", "--faith"],
 ];
 
+// ── Save (bookmark) toggle — shown in the Dossier header ────────────────────
+function SaveButton({ eventId }: { eventId: number }) {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    let alive = true;
+    api<{ saved: boolean }>(`/api/saved-events?eventId=${eventId}`)
+      .then((r) => alive && setSaved(r.saved))
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [user, eventId]);
+
+  async function toggle() {
+    if (!user) {
+      toast("Sign in to save events");
+      return;
+    }
+    setLoading(true);
+    try {
+      if (saved) {
+        await api("/api/saved-events", { method: "DELETE", body: JSON.stringify({ eventId }) });
+        setSaved(false);
+        toast("Removed from saved");
+      } else {
+        await api("/api/saved-events", { method: "POST", body: JSON.stringify({ eventId }) });
+        setSaved(true);
+        toast("Saved — find it on your dashboard");
+      }
+    } catch {
+      toast("Something went wrong — try again");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <button
+      className="icon-btn"
+      style={{ width: 28, height: 28, color: saved ? "var(--good-news)" : undefined }}
+      onClick={toggle}
+      disabled={loading}
+      title={saved ? "Remove from saved" : "Save event"}
+    >
+      {saved ? "★" : "☆"}
+    </button>
+  );
+}
+
 function Respond({ event }: { event: EventDTO }) {
   const { toast } = useToast();
   const [give, setGive] = useState<{ org: string; appeal: string; note?: string; suggestedAmount?: number } | null>(null);
@@ -422,9 +476,12 @@ export function Dossier({
               {event.severity}
             </span>
             <span>· {ago(event.timestamp)}</span>
-            <button className="icon-btn" style={{ marginLeft: "auto", width: 28, height: 28 }} onClick={onClose} title="Close">
-              ✕
-            </button>
+            <span style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
+              <SaveButton eventId={event.id} />
+              <button className="icon-btn" style={{ width: 28, height: 28 }} onClick={onClose} title="Close">
+                ✕
+              </button>
+            </span>
           </div>
           <h2>{event.title}</h2>
           <div className="dt-loc">

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getCountry, listEvents } from "@/lib/repos";
 import { Nav } from "@/components/Nav";
+import { FollowCountryButton } from "@/components/FollowCountryButton";
 import { CATEGORIES, scoreColorToken, trendGlyph } from "@/lib/client";
 
 export const dynamic = "force-dynamic";
@@ -18,9 +19,12 @@ export default async function CountryPage({ params }: { params: Promise<{ name: 
       <div className="page">
         <div className="page-hd">
           <div className="eyebrow">Country dashboard</div>
-          <h1>
-            {country.flag} {country.name}
-          </h1>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <h1>
+              {country.flag} {country.name}
+            </h1>
+            <FollowCountryButton country={country.name} />
+          </div>
         </div>
 
         <div className="card-grid">
