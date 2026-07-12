@@ -20,6 +20,9 @@ const SUGGESTIONS = [
   "Any flooding in Pakistan?",
   "What are today's good news stories?",
   "Any humanitarian emergencies right now?",
+  "Summarise the situation in Sudan",
+  "Compare Yemen and Syria",
+  "How is confidence/trust scored on this platform?",
 ];
 
 export function ChatView() {

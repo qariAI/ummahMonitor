@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "@/styles/components.css";
 import { Providers } from "@/components/Providers";
+import { GlobalBriefButton } from "@/components/GlobalBriefButton";
 
 export const metadata: Metadata = {
   title: "UmmahMonitor — live situational awareness for the Ummah",
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <Providers>{children}</Providers>
+        <GlobalBriefButton />
       </body>
     </html>
   );

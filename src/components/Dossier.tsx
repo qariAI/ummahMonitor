@@ -14,12 +14,45 @@ import {
 import { GiveSheet } from "./GiveSheet";
 import { useAuth, useToast } from "./Providers";
 import type { ContextEvent, ContextQuake, ContextFlight } from "@/app/api/context/route";
+import type { AssessedSource } from "@/lib/confidence";
 
 function initials(name: string): string {
   return name.replace(/[^A-Za-z]/g, "").slice(0, 2).toUpperCase() || "UM";
 }
 
 // ── Verification panel — renders the shared trust assessment verbatim ────────
+// Real source-tier breakdown for this event — answers "why does this
+// confidence score exist" by showing which kinds of sources actually
+// corroborated it. Built from the same AssessedSource list rendered below,
+// not a separate/invented metric.
+function TierBreakdown({ sources }: { sources: AssessedSource[] }) {
+  const byTier = new Map<string, { count: number; token: string; label: string }>();
+  for (const s of sources) {
+    if (!byTier.has(s.tier)) byTier.set(s.tier, { count: 0, token: s.tierToken, label: s.tierLabel });
+    byTier.get(s.tier)!.count++;
+  }
+  const rows = Array.from(byTier.values()).sort((a, b) => b.count - a.count);
+  if (rows.length === 0) return null;
+  const max = Math.max(...rows.map((r) => r.count));
+
+  return (
+    <div style={{ margin: "10px 0 4px" }}>
+      <div style={{ fontSize: 10, fontWeight: 700, color: "var(--faint)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>
+        Source Intelligence
+      </div>
+      {rows.map((r) => (
+        <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+          <span style={{ width: 76, flex: "none", fontSize: 11, color: "var(--muted)" }}>{r.label}</span>
+          <div style={{ flex: 1, height: 6, background: "var(--bg2)", borderRadius: 3, overflow: "hidden" }}>
+            <div style={{ width: `${(r.count / max) * 100}%`, height: "100%", background: `var(${r.token})`, borderRadius: 3 }} />
+          </div>
+          <span style={{ width: 14, flex: "none", fontSize: 10.5, fontFamily: "var(--mono)", color: "var(--text)" }}>{r.count}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Verification({ event }: { event: EventDTO }) {
   const t = event.trust;
   const color = `var(${t.status === "published" ? "--faith" : t.status === "developing" ? "--humanitarian" : "--conflict"})`;
@@ -65,6 +98,7 @@ function Verification({ event }: { event: EventDTO }) {
         </div>
         <div className="conf-note">{t.note}</div>
       </div>
+      <TierBreakdown sources={t.sources} />
       <div className="corrob-hd">
         <h5>Corroboration</h5>
         <span

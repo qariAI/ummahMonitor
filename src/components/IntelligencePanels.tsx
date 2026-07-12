@@ -130,6 +130,44 @@ function FeaturedCountryAnalysis({ countries }: { countries: CountryDTO[] }) {
   );
 }
 
+// ── AI Detection feed — real, computed observations, never invented trend
+// deltas (no historical time-series exists yet to honestly compute "dropped
+// 12%" style claims — see standing rule against fabricating data). ─────────
+function AiDetectionFeed({ events, countries }: { events: EventDTO[]; countries: CountryDTO[] }) {
+  const published = events.filter((e) => e.trust.status !== "withheld");
+
+  const byCountryHumanitarian = new Map<string, number>();
+  for (const e of published) {
+    if (e.category === "humanitarian") byCountryHumanitarian.set(e.country, (byCountryHumanitarian.get(e.country) ?? 0) + 1);
+  }
+  const topHumanitarian = Array.from(byCountryHumanitarian.entries()).sort((a, b) => b[1] - a[1])[0];
+
+  const goodNewsCount = published.filter((e) => e.category === "good_news").length;
+  const countriesWithEmergency = new Set(published.filter((e) => e.severity === "critical" || e.severity === "high").map((e) => e.country));
+  const calmCountries = countries.filter((c) => !countriesWithEmergency.has(c.name)).length;
+  const highConfidenceCount = published.filter((e) => e.trust.confidence >= 85).length;
+
+  const observations = [
+    topHumanitarian && `${topHumanitarian[1]} humanitarian ${topHumanitarian[1] === 1 ? "event" : "events"} tracked in ${topHumanitarian[0]} right now.`,
+    goodNewsCount > 0 && `${goodNewsCount} good news ${goodNewsCount === 1 ? "story" : "stories"} verified today.`,
+    `${calmCountries} of ${countries.length} monitored countries currently have no active emergency.`,
+    highConfidenceCount > 0 && `${highConfidenceCount} ${highConfidenceCount === 1 ? "development is" : "developments are"} at 85%+ confidence.`,
+  ].filter((x): x is string => typeof x === "string");
+
+  if (observations.length === 0) return null;
+
+  return (
+    <div className="ip-panel">
+      <div className="ip-hd">🧠 AI DETECTED</div>
+      <ul className="ip-list">
+        {observations.map((o, i) => (
+          <li key={i}><span className="ip-org-note">{o}</span></li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function IntelligencePanels({ events, countries }: { events: EventDTO[]; countries: CountryDTO[] }) {
   return (
     <div className="ip-section">
@@ -139,7 +177,10 @@ export function IntelligencePanels({ events, countries }: { events: EventDTO[]; 
         <VerifiedSourcesPanel />
       </div>
       <div className="ip-grid-2">
+        <AiDetectionFeed events={events} countries={countries} />
         <BroadcastPreview />
+      </div>
+      <div className="ip-grid-2">
         <FeaturedCountryAnalysis countries={countries} />
       </div>
     </div>
