@@ -1,0 +1,124 @@
+/* Design tokens — values from README "Design Tokens". Dark is default; the
+   theme is stamped via data-theme on <html> and read before first paint. */
+
+:root {
+  --faith: #22c55e; /* emerald — positive / verified / published */
+  --community: #38bdf8; /* cyan */
+  --humanitarian: #f0b04a; /* developing / warning */
+  --conflict: #ef4444; /* soft red — withheld / rejected / critical */
+  --economy: #a78bfa;
+  --education: #2dd4bf;
+  --good-news: #d4af37; /* gold — hope / uplifting, deliberately the premium accent */
+
+  /* Situation Index severity bands — intentionally separate from the
+     category colors above, so a country's 0–100 score always reads the
+     same way (green→red) regardless of what category tokens mean elsewhere. */
+  --score-low: #22c55e;      /* 0–25 */
+  --score-medium: #d4af37;   /* 26–50 */
+  --score-high: #f0973f;     /* 51–75 */
+  --score-critical: #ef4444; /* 76–100 */
+
+  --radius: 20px;
+  --radius-sm: 14px;
+
+  --display: "Amiri", Georgia, serif;
+  --sans: "Inter", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+}
+
+/* Dark theme (default) — charcoal base + glassmorphism panels */
+:root,
+:root[data-theme="dark"] {
+  --bg: #0b1220;
+  --bg2: #121b2d;
+  --panel: rgba(18, 27, 45, 0.68);
+  --panel-solid: #121b2d;
+  --stroke: rgba(148, 168, 190, 0.12);
+  --stroke2: rgba(148, 168, 190, 0.22);
+  --text: #f3f6fa;
+  --muted: #8a98a8;
+  --faint: #566578;
+  --dot: rgba(148, 168, 190, 0.14);
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  --glass-blur: blur(20px);
+}
+
+:root[data-theme="light"] {
+  --bg: #eef1f4;
+  --bg2: #e4e8ed;
+  --panel: rgba(255, 255, 255, 0.88);
+  --panel-solid: #ffffff;
+  --stroke: rgba(30, 50, 70, 0.1);
+  --stroke2: rgba(30, 50, 70, 0.2);
+  --text: #0f1720;
+  --muted: #586878;
+  --faint: #93a2b1;
+  --dot: rgba(30, 50, 70, 0.08);
+  --shadow: 0 14px 48px rgba(20, 40, 60, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--faith) 30%, transparent);
+}
+
+h1,
+h2 {
+  font-family: var(--display);
+  font-weight: 700;
+}
+
+.mono {
+  font-family: var(--mono);
+}
+
+/* scrollbars */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--stroke2);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
