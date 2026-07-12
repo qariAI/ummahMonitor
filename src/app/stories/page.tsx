@@ -30,27 +30,33 @@ export default function StoriesIndexPage() {
                 {STORY_CATEGORIES[cat]}
               </h2>
               <div className="card-grid">
-                {stories.map((s) => (
-                  <Link
-                    key={s.slug}
-                    href={s.status === "published" ? `/stories/${s.slug}` : "#"}
-                    className="card"
-                    style={{
-                      textDecoration: "none", display: "block",
-                      opacity: s.status === "coming_soon" ? 0.55 : 1,
-                      cursor: s.status === "coming_soon" ? "default" : "pointer",
-                    }}
-                    onClick={(e) => { if (s.status === "coming_soon") e.preventDefault(); }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                      <h3 style={{ margin: 0 }}>{s.title}</h3>
-                      {s.status === "coming_soon" && (
-                        <span className="badge" style={{ background: "var(--bg2)", color: "var(--faint)" }}>Coming soon</span>
-                      )}
+                {stories.map((s) => {
+                  const cardStyle: React.CSSProperties = {
+                    textDecoration: "none", display: "block",
+                    opacity: s.status === "coming_soon" ? 0.55 : 1,
+                    cursor: s.status === "coming_soon" ? "default" : "pointer",
+                  };
+                  const cardContent = (
+                    <>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                        <h3 style={{ margin: 0 }}>{s.title}</h3>
+                        {s.status === "coming_soon" && (
+                          <span className="badge" style={{ background: "var(--bg2)", color: "var(--faint)" }}>Coming soon</span>
+                        )}
+                      </div>
+                      <p style={{ fontSize: 12.5, color: "var(--muted)", lineHeight: 1.5, margin: 0 }}>{s.dek}</p>
+                    </>
+                  );
+                  return s.status === "published" ? (
+                    <Link key={s.slug} href={`/stories/${s.slug}`} className="card" style={cardStyle}>
+                      {cardContent}
+                    </Link>
+                  ) : (
+                    <div key={s.slug} className="card" style={cardStyle}>
+                      {cardContent}
                     </div>
-                    <p style={{ fontSize: 12.5, color: "var(--muted)", lineHeight: 1.5, margin: 0 }}>{s.dek}</p>
-                  </Link>
-                ))}
+                  );
+                })}
               </div>
             </div>
           );
