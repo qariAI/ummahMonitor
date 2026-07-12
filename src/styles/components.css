@@ -1017,6 +1017,8 @@ a.bento-tile:hover { border-color: var(--stroke2); transform: translateY(-1px); 
 .ov-tile-hd { display: flex; align-items: center; gap: 8px; }
 .ov-tile-icon { font-size: 18px; flex: none; }
 .ov-tile-title { font-size: 12.5px; font-weight: 700; color: var(--text); line-height: 1.2; }
+.ov-tile-num { color: var(--faint); font-weight: 600; }
+.ov-tile .bento-map-preview { height: 46px; margin-bottom: 6px; }
 .ov-tile-sub { font-size: 10px; color: var(--faint); line-height: 1.2; }
 .ov-tile-body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 4px; min-height: 0; overflow: hidden; }
 .ov-stat { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--text); }
