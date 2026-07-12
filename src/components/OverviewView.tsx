@@ -14,13 +14,13 @@ import type { CountryDTO, EventDTO } from "@/lib/repos";
 // calendar tile (removed per instruction) — swapped for Data Stories and
 // Trust Analytics instead, both real and already built. Every number here
 // is computed from the same live event/country data as the rest of the app.
-function Tile({ href, icon, title, sub, children }: { href: string; icon: string; title: string; sub: string; children: React.ReactNode }) {
+function Tile({ n, href, icon, title, sub, children }: { n: number; href: string; icon: string; title: string; sub: string; children: React.ReactNode }) {
   return (
     <Link href={href} className="ov-tile">
       <div className="ov-tile-hd">
         <span className="ov-tile-icon">{icon}</span>
         <div>
-          <div className="ov-tile-title">{title}</div>
+          <div className="ov-tile-title"><span className="ov-tile-num">{n}.</span> {title}</div>
           <div className="ov-tile-sub">{sub}</div>
         </div>
       </div>
@@ -72,20 +72,33 @@ export function OverviewView({ events, countries }: { events: EventDTO[]; countr
     <>
       <Nav />
       <div className="ov-grid">
-        <Tile href="/" icon="🌍" title="Live Map" sub="Real-time overview">
+        <Tile n={1} href="/" icon="🌍" title="Live Map" sub="Real-time overview">
+          <div className="bento-map-preview">
+            {published.slice(0, 24).map((e) => (
+              <span
+                key={e.id}
+                className="bento-map-dot"
+                style={{
+                  left: `${((e.lon + 180) / 360) * 100}%`,
+                  top: `${((90 - e.lat) / 180) * 100}%`,
+                  background: `var(${CATEGORIES[e.category].token})`,
+                }}
+              />
+            ))}
+          </div>
           <div className="ov-stat">{countries.length} <span>countries</span></div>
           <div className="ov-stat-alt">{activeEmergencies} active emergencies</div>
         </Tile>
 
-        <Tile href="/broadcast" icon="🎙" title="AI Broadcast" sub="Your AI news briefing">
+        <Tile n={2} href="/broadcast" icon="🎙" title="AI Broadcast" sub="Your AI news briefing">
           <p className="ov-line">{headline ?? "Loading today's briefing…"}</p>
         </Tile>
 
-        <Tile href="/holy-sites" icon="🕋" title="Holy Sites Live" sub="Sacred places, verified">
+        <Tile n={3} href="/holy-sites" icon="🕋" title="Holy Sites Live" sub="Sacred places, verified">
           <div className="ov-line">Masjid al-Haram · an-Nabawi · Al-Aqsa</div>
         </Tile>
 
-        <Tile href="/ai-intelligence" icon="🧠" title="AI Intelligence" sub="Insight engine">
+        <Tile n={4} href="/ai-intelligence" icon="🧠" title="AI Intelligence" sub="Insight engine">
           {escalating ? (
             <div className="ov-stat" style={{ color: `var(${scoreColorToken(escalating.score)})` }}>
               {escalating.flag} {escalating.name} ▲ <span>{escalating.score}</span>
@@ -93,42 +106,42 @@ export function OverviewView({ events, countries }: { events: EventDTO[]; countr
           ) : <div className="ov-line">No escalating situations</div>}
         </Tile>
 
-        <Tile href="/chat" icon="💬" title="AI Copilot" sub="Ask the Ummah database">
+        <Tile n={5} href="/chat" icon="💬" title="AI Copilot" sub="Ask the Ummah database">
           <div className="ov-line">"What's happening in Gaza today?"</div>
         </Tile>
 
-        <Tile href="/" icon="⏳" title="Timeline Replay" sub="Watch history unfold">
+        <Tile n={6} href="/" icon="⏳" title="Timeline Replay" sub="Watch history unfold">
           <div className="ov-stat">{published.length} <span>real events, replayable</span></div>
         </Tile>
 
-        <Tile href="/data" icon="🤲" title="Humanitarian" sub="For NGOs, for impact">
+        <Tile n={7} href="/humanitarian" icon="🤲" title="Humanitarian" sub="For NGOs, for impact">
           <div className="ov-stat">{orgMap.size} <span>organisations active</span></div>
           <div className="ov-stat-alt">{topOrgs.join(" · ") || "None active"}</div>
         </Tile>
 
-        <Tile href="/data" icon="📊" title="Data & Statistics" sub="Visualise. Compare.">
+        <Tile n={8} href="/data" icon="📊" title="Data & Statistics" sub="Visualise. Compare.">
           {topCats.map(({ c, n }) => (
             <span key={c} className="ov-chip" style={{ color: `var(${CATEGORIES[c].token})` }}>{CATEGORIES[c].label} {n}</span>
           ))}
         </Tile>
 
-        <Tile href="/stories" icon="📖" title="Data Stories" sub="Sourced visual narratives">
+        <Tile n={9} href="/stories" icon="📖" title="Data Stories" sub="Sourced visual narratives">
           <div className="ov-stat">{publishedStories.length} <span>published {publishedStories.length === 1 ? "story" : "stories"}</span></div>
           <div className="ov-stat-alt">{publishedStories[0]?.title ?? "—"}</div>
         </Tile>
 
-        <Tile href="/data" icon="✓" title="Trust & Verification" sub="Why you can rely on this">
+        <Tile n={10} href="/data" icon="✓" title="Trust & Verification" sub="Why you can rely on this">
           <div className="ov-stat">{avgConfidence}% <span>avg. confidence</span></div>
           {topTier && <div className="ov-stat-alt">Mostly {TIER_META[topTier[0] as keyof typeof TIER_META]?.label ?? topTier[0]} sources</div>}
         </Tile>
 
-        <Tile href="/ai-intelligence" icon="📈" title="Situation Index" sub="Ranked by score">
+        <Tile n={11} href="/ai-intelligence" icon="📈" title="Situation Index" sub="Ranked by score">
           {topRanked.map((c, i) => (
             <div key={c.name} className="ov-rank"><span>{i + 1}. {c.flag} {c.name}</span><span style={{ color: `var(${scoreColorToken(c.score)})` }}>{c.score}</span></div>
           ))}
         </Tile>
 
-        <Tile href="/" icon="📡" title="World Pulse" sub="Every second, everywhere">
+        <Tile n={12} href="/" icon="📡" title="World Pulse" sub="Every second, everywhere">
           {latestEvents.map((e) => (
             <div key={e.id} className="ov-line" style={{ fontSize: 10.5 }}>{e.country} · {ago(e.timestamp)}</div>
           ))}
