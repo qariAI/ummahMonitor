@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import type { CountryDTO, EventDTO } from "@/lib/repos";
 import { CATEGORIES, ago, api, severityIcon, severityToken, type CategoryKey } from "@/lib/client";
 import { statusToken } from "@/lib/confidence";
@@ -37,6 +38,7 @@ export function MapView({
     faith: true, community: true, humanitarian: true, conflict: true, economy: true, education: true, good_news: true,
   });
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const searchParams = useSearchParams();
   const [layers, setLayers] = useState<MapLayers>({
     events: true, corridors: true, pulses: true, pressure: true, graticule: true,
     quakes: false, flights: false,
@@ -129,6 +131,16 @@ export function MapView({
     setReplayTime(timelineBounds.maxT);
     setTimelineActive(true);
   }
+
+  // Read ?event=<id> and ?timeline=1 once on load — this is what makes
+  // "jump to this event" links from Chat/Holy Sites/Dashboard/Overview/etc.
+  // actually select the event, not just navigate to a blank map.
+  useEffect(() => {
+    const eventParam = searchParams.get("event");
+    if (eventParam) setSelectedId(Number(eventParam));
+    if (searchParams.get("timeline") === "1") enterTimeline();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const displayedEvents = timelineActive ? filtered.filter((e) => e.timestamp <= replayTime) : filtered;
 

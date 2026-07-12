@@ -7,6 +7,8 @@ import { KpiCard } from "./viz/KpiCard";
 import { BubbleChart } from "./viz/BubbleChart";
 import { Treemap } from "./viz/Treemap";
 import { EventTimeline } from "./viz/EventTimeline";
+import { ConfidenceAnalytics } from "./viz/ConfidenceAnalytics";
+import { CountryComparison } from "./viz/CountryComparison";
 import { CATEGORIES, api, type CategoryKey } from "@/lib/client";
 import type { CountryDTO, EventDTO } from "@/lib/repos";
 
@@ -125,6 +127,11 @@ export function DataIntelligenceView({
         </div>
         <div style={{ marginTop: 16 }}>
           <EventTimeline events={filtered} onSelectEvent={(id) => router.push(`/?event=${id}`)} />
+        </div>
+
+        <div className="viz-grid" style={{ marginTop: 16 }}>
+          <ConfidenceAnalytics events={filtered} />
+          <CountryComparison countries={countries} events={filtered} />
         </div>
 
         <p style={{ fontSize: 10.5, color: "var(--faint)", marginTop: 18 }}>

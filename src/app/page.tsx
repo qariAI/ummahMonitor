@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { listEvents, listCountries } from "@/lib/repos";
 import { MapView } from "@/components/MapView";
 import { getSessionUser } from "@/lib/auth";
@@ -17,5 +18,9 @@ export default async function HomePage() {
     listEvents({ publicOnly: true }),
     listCountries(),
   ]);
-  return <MapView initialEvents={events} countries={countries} />;
+  return (
+    <Suspense fallback={null}>
+      <MapView initialEvents={events} countries={countries} />
+    </Suspense>
+  );
 }

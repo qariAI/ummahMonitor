@@ -9,7 +9,7 @@ import type { Tier } from "@/lib/types";
 import { CountryBriefing } from "./CountryBriefing";
 
 // ── AI Broadcast preview ─────────────────────────────────────────────────
-function BroadcastPreview() {
+export function BroadcastPreview() {
   const [headline, setHeadline] = useState<string | null>(null);
   useEffect(() => {
     fetch("/api/briefing?scope=global")
@@ -31,7 +31,7 @@ function BroadcastPreview() {
 }
 
 // ── Humanitarian panel — real responder orgs pulled from event data ──────
-function HumanitarianPanel({ events }: { events: EventDTO[] }) {
+export function HumanitarianPanel({ events }: { events: EventDTO[] }) {
   const humanitarian = events.filter((e) => e.category === "humanitarian" && e.trust.status !== "withheld");
   const orgMap = new Map<string, { note: string; country: string }>();
   for (const e of humanitarian) {
@@ -59,7 +59,7 @@ function HumanitarianPanel({ events }: { events: EventDTO[] }) {
 }
 
 // ── Data Visualisation preview — real category breakdown ─────────────────
-function DataVizPreview({ events }: { events: EventDTO[] }) {
+export function DataVizPreview({ events }: { events: EventDTO[] }) {
   const published = events.filter((e) => e.trust.status !== "withheld");
   const counts = new Map<CategoryKey, number>();
   for (const e of published) counts.set(e.category, (counts.get(e.category) ?? 0) + 1);
@@ -89,7 +89,7 @@ function DataVizPreview({ events }: { events: EventDTO[] }) {
 }
 
 // ── Verified Sources — real source directory, grouped by tier ────────────
-function VerifiedSourcesPanel() {
+export function VerifiedSourcesPanel() {
   const byTier = new Map<Tier, string[]>();
   for (const [name, tier] of Object.entries(SOURCE_DIRECTORY)) {
     if (!byTier.has(tier)) byTier.set(tier, []);
@@ -114,7 +114,7 @@ function VerifiedSourcesPanel() {
 }
 
 // ── Featured Country AI Situation Analysis — reuses the real CountryBriefing ──
-function FeaturedCountryAnalysis({ countries }: { countries: CountryDTO[] }) {
+export function FeaturedCountryAnalysis({ countries }: { countries: CountryDTO[] }) {
   const top = [...countries].sort((a, b) => b.score - a.score)[0];
   if (!top) return null;
   return (
@@ -133,7 +133,7 @@ function FeaturedCountryAnalysis({ countries }: { countries: CountryDTO[] }) {
 // ── AI Detection feed — real, computed observations, never invented trend
 // deltas (no historical time-series exists yet to honestly compute "dropped
 // 12%" style claims — see standing rule against fabricating data). ─────────
-function AiDetectionFeed({ events, countries }: { events: EventDTO[]; countries: CountryDTO[] }) {
+export function AiDetectionFeed({ events, countries }: { events: EventDTO[]; countries: CountryDTO[] }) {
   const published = events.filter((e) => e.trust.status !== "withheld");
 
   const byCountryHumanitarian = new Map<string, number>();

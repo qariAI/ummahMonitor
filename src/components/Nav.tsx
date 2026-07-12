@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth, useTheme } from "./Providers";
 import { AuthModal } from "./AuthModal";
+import { GlobalSearch } from "./GlobalSearch";
 
 function StarMark() {
   return (
@@ -14,19 +15,59 @@ function StarMark() {
   );
 }
 
-const BASE_LINKS = [
-  { href: "/", label: "Map" },
-  { href: "/chat", label: "Chat" },
+// Four primary workspaces (Overview / Live Map / Data & Statistics /
+// AI Intelligence) plus Broadcast and Stories stay in the main nav.
+// Chat, Dashboard, and Analytics move to the "More" menu below — real
+// pages, still one click away, just not competing for primary attention.
+const PRIMARY_LINKS = [
+  { href: "/overview", label: "Overview" },
+  { href: "/", label: "Live Map" },
+  { href: "/data", label: "Data & Statistics" },
+  { href: "/ai-intelligence", label: "AI Intelligence" },
   { href: "/broadcast", label: "Broadcast" },
-  { href: "/data", label: "Data Intelligence" },
   { href: "/stories", label: "Stories" },
-  { href: "/dashboard", label: "Dashboard" },
   { href: "/holy-sites", label: "Holy sites" },
-  { href: "/analytics", label: "Analytics" },
   { href: "/settings", label: "Settings" },
 ];
 
+const MORE_LINKS = [
+  { href: "/chat", label: "Chat" },
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/analytics", label: "Analytics" },
+  { href: "/calendar", label: "Islamic Calendar" },
+];
+
 const MODERATION_LINK = { href: "/moderation", label: "Queue" };
+
+function MoreMenu({ links, active }: { links: { href: string; label: string }[]; active: boolean }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, []);
+
+  return (
+    <div className="nav-more" ref={ref}>
+      <button className={`nav-more-btn${active ? " active" : ""}`} onClick={() => setOpen((v) => !v)}>
+        More ▾
+      </button>
+      {open && (
+        <div className="nav-more-dropdown">
+          {links.map((l) => (
+            <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>
+              {l.label}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function Nav({ children }: { children?: React.ReactNode }) {
   const path = usePathname();
@@ -34,27 +75,26 @@ export function Nav({ children }: { children?: React.ReactNode }) {
   const { theme, toggle } = useTheme();
   const [authOpen, setAuthOpen] = useState(false);
   const isModerator = user?.authRole === "moderator" || user?.authRole === "admin";
-  // Insert the moderator-only Queue link right before Settings, whatever
-  // else is in BASE_LINKS — avoids hardcoded indices silently dropping
-  // links whenever BASE_LINKS changes.
-  const LINKS = isModerator
-    ? [...BASE_LINKS.slice(0, -1), MODERATION_LINK, BASE_LINKS[BASE_LINKS.length - 1]]
-    : BASE_LINKS;
+
+  const moreLinks = isModerator ? [...MORE_LINKS, MODERATION_LINK] : MORE_LINKS;
+  const moreActive = moreLinks.some((l) => l.href === path);
 
   return (
     <nav className="nav">
-      <Link href="/" className="brand" style={{ textDecoration: "none" }} title="Real-time insights across the Muslim world">
+      <Link href="/overview" className="brand" style={{ textDecoration: "none" }} title="Real-time insights across the Muslim world">
         <span className="mark"><StarMark /></span>
         <h1>UmmahMonitor</h1>
       </Link>
       <span className="live-dot" title="Live" />
       <div className="nav-links">
-        {LINKS.map((l) => (
+        {PRIMARY_LINKS.map((l) => (
           <Link key={l.href} href={l.href} className={path === l.href ? "active" : ""}>
             {l.label}
           </Link>
         ))}
+        <MoreMenu links={moreLinks} active={moreActive} />
       </div>
+      <GlobalSearch />
       <span className="nav-spacer" />
       {children}
       <button className="icon-btn" onClick={toggle} title="Toggle theme" aria-label="Toggle theme">
