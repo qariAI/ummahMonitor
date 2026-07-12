@@ -3,18 +3,20 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { CountryDTO, EventDTO } from "@/lib/repos";
 import { CATEGORIES, ago, api, severityIcon, severityToken, type CategoryKey } from "@/lib/client";
+import { statusToken } from "@/lib/confidence";
 import { Nav } from "./Nav";
 import { WorldMap, type MapLayers, type WorldMapHandle } from "./WorldMap";
 import type { QuakeMarker } from "@/lib/liveQuakes";
 import type { FlightMarker } from "@/lib/liveFlights";
 import { StatsBar } from "./StatsBar";
-import { ExploreStrip } from "./ExploreStrip";
 import { MapSummaryWidget } from "./MapSummaryWidget";
 import { DailyBriefing } from "./DailyBriefing";
 import { Dossier } from "./Dossier";
 import { SubmitReport } from "./SubmitReport";
 import { Ticker } from "./Ticker";
 import { SignalsRail } from "./SignalsRail";
+import { TimelineScrubber } from "./TimelineScrubber";
+import { IntelligencePanels } from "./IntelligencePanels";
 import { useAuth } from "./Providers";
 
 const RANGES = ["24h", "7d", "30d", "all"] as const;
@@ -111,7 +113,26 @@ export function MapView({
     () => events.filter((e) => active[e.category as CategoryKey]),
     [events, active],
   );
-  const selected = filtered.find((e) => e.id === selectedId) ?? events.find((e) => e.id === selectedId) ?? null;
+
+  // Timeline Replay — real event timestamps only, no prediction/invented
+  // future state. minT/maxT come from whatever's currently filtered so
+  // replay always matches the active category selection.
+  const [timelineActive, setTimelineActive] = useState(false);
+  const timelineBounds = useMemo(() => {
+    if (filtered.length === 0) return { minT: Date.now() - 86400_000, maxT: Date.now() };
+    const times = filtered.map((e) => e.timestamp);
+    return { minT: Math.min(...times), maxT: Math.max(...times) };
+  }, [filtered]);
+  const [replayTime, setReplayTime] = useState(timelineBounds.maxT);
+
+  function enterTimeline() {
+    setReplayTime(timelineBounds.maxT);
+    setTimelineActive(true);
+  }
+
+  const displayedEvents = timelineActive ? filtered.filter((e) => e.timestamp <= replayTime) : filtered;
+
+  const selected = displayedEvents.find((e) => e.id === selectedId) ?? events.find((e) => e.id === selectedId) ?? null;
   const selectedCountry = selected ? countries.find((c) => c.name === selected.country) ?? null : null;
 
   const countryByName = useMemo(() => new Map(countries.map((c) => [c.name, c])), [countries]);
@@ -135,15 +156,23 @@ export function MapView({
       </Nav>
 
       <Ticker events={filtered} onSelect={setSelectedId} />
-      <StatsBar events={events} countries={countries} lastUpdatedAt={lastUpdatedAt} />
-      <ExploreStrip />
+      <StatsBar events={events} countries={countries} />
+      {timelineActive && (
+        <TimelineScrubber
+          minT={timelineBounds.minT}
+          maxT={timelineBounds.maxT}
+          replayTime={replayTime}
+          onChange={setReplayTime}
+          onExit={() => setTimelineActive(false)}
+        />
+      )}
 
       <div
-        className={`map-screen${filtered.length ? " with-three-tickers" : " with-two-tickers"}`}
+        className={`map-screen${filtered.length ? " with-two-tickers" : " with-ticker"}${timelineActive ? " with-timeline" : ""}`}
       >
         <WorldMap
           ref={mapRef}
-          events={filtered}
+          events={displayedEvents}
           countries={countries}
           layers={layers}
           selectedId={selectedId}
@@ -158,7 +187,15 @@ export function MapView({
           <div className="rail-hd">
             <span className="live-dot" />
             <h2>Live feed</h2>
-            <span className="count">{filtered.length} events</span>
+            <span className="count">{displayedEvents.length} events</span>
+            <button
+              className="pill-btn"
+              style={{ marginLeft: "auto", fontSize: 11 }}
+              onClick={() => (timelineActive ? setTimelineActive(false) : enterTimeline())}
+              title="Replay real event history over time"
+            >
+              {timelineActive ? "◀ Live" : "🕐 Timeline Replay"}
+            </button>
           </div>
           <div className="chips">
             <span style={{ width: "100%", fontSize: 10, color: "var(--faint)", marginBottom: 2 }}>
@@ -176,7 +213,7 @@ export function MapView({
             ))}
           </div>
           <div className="feed-list">
-            {filtered.map((e) => (
+            {displayedEvents.map((e) => (
               <div
                 key={e.id}
                 className={`ev sev-${e.severity}${e.id === selectedId ? " sel" : ""}`}
@@ -195,10 +232,19 @@ export function MapView({
                     <span>{e.country}</span>
                     <span>· {ago(e.timestamp)}</span>
                   </div>
+                  <div className="ev-trust">
+                    <span style={{ color: `var(${statusToken(e.trust.status)})` }}>
+                      {e.trust.status === "published" ? "✓ VERIFIED" : e.trust.statusLabel}
+                    </span>
+                    <span className="ev-trust-sep">·</span>
+                    <span>{e.trust.confidence}% confidence</span>
+                    <span className="ev-trust-sep">·</span>
+                    <span>{e.trust.corroborationLine}</span>
+                  </div>
                 </div>
               </div>
             ))}
-            {filtered.length === 0 && (
+            {displayedEvents.length === 0 && (
               <p style={{ padding: 16, color: "var(--muted)", fontSize: 13 }}>No events in this range/filter.</p>
             )}
           </div>
@@ -222,14 +268,14 @@ export function MapView({
           </div>
         )}
 
-        <MapSummaryWidget events={filtered} countries={countries} quakes={quakes} flights={flights} />
+        <MapSummaryWidget events={displayedEvents} countries={countries} quakes={quakes} flights={flights} />
 
         <SignalsRail
           countries={countries}
-          events={filtered}
+          events={displayedEvents}
           onSelectCountry={(c) => {
             mapRef.current?.flyTo(c.pos[0], c.pos[1], 3.2);
-            const ev = filtered.find((e) => e.country === c.name);
+            const ev = displayedEvents.find((e) => e.country === c.name);
             if (ev) setSelectedId(ev.id);
           }}
           onSelectEvent={(id) => setSelectedId(id)}
@@ -237,6 +283,8 @@ export function MapView({
 
         <Dossier event={selected} country={selectedCountry} onClose={() => setSelectedId(null)} onSelectEvent={setSelectedId} />
       </div>
+
+      <IntelligencePanels events={events} countries={countries} />
 
       {submitOpen && (
         <SubmitReport
