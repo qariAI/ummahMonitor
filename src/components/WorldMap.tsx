@@ -401,7 +401,10 @@ export const WorldMap = forwardRef<WorldMapHandle, {
           ctx.fill();
           countryHitRef.current.push({ x: p.x, y: p.y, r: radius, name: c.name });
 
-          if (p.x > -60 && p.x < w + 60 && p.y > -20 && p.y < h + 20) {
+          // Only label higher-priority countries (score > 30) — a lightweight
+          // declutter for dense clusters like the Levant/Gulf. Real zoom-aware
+          // label clustering is a bigger feature, tracked separately.
+          if (c.score > 30 && p.x > -60 && p.x < w + 60 && p.y > -20 && p.y < h + 20) {
             ctx.font = "600 11px Inter, sans-serif";
             ctx.textAlign = "center";
             ctx.fillStyle = withAlpha(textCol, 0.8);

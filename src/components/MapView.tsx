@@ -8,6 +8,7 @@ import { WorldMap, type MapLayers, type WorldMapHandle } from "./WorldMap";
 import type { QuakeMarker } from "@/lib/liveQuakes";
 import type { FlightMarker } from "@/lib/liveFlights";
 import { StatsBar } from "./StatsBar";
+import { ExploreStrip } from "./ExploreStrip";
 import { MapSummaryWidget } from "./MapSummaryWidget";
 import { DailyBriefing } from "./DailyBriefing";
 import { Dossier } from "./Dossier";
@@ -36,7 +37,7 @@ export function MapView({
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [layers, setLayers] = useState<MapLayers>({
     events: true, corridors: true, pulses: true, pressure: true, graticule: true,
-    quakes: true, flights: true,
+    quakes: false, flights: false,
   });
   const [layersOpen, setLayersOpen] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
@@ -135,9 +136,10 @@ export function MapView({
 
       <Ticker events={filtered} onSelect={setSelectedId} />
       <StatsBar events={events} countries={countries} lastUpdatedAt={lastUpdatedAt} />
+      <ExploreStrip />
 
       <div
-        className={`map-screen${filtered.length ? " with-two-tickers" : " with-ticker"}`}
+        className={`map-screen${filtered.length ? " with-three-tickers" : " with-two-tickers"}`}
       >
         <WorldMap
           ref={mapRef}

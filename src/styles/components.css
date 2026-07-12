@@ -142,6 +142,7 @@
 }
 .map-screen.with-ticker { height: calc(100vh - 54px - 32px); }
 .map-screen.with-two-tickers { height: calc(100vh - 54px - 64px); }
+.map-screen.with-three-tickers { height: calc(100vh - 54px - 96px); }
 .map-canvas-wrap {
   position: absolute;
   inset: 0;
@@ -267,6 +268,20 @@
 .stat-icon { font-size: 13px; }
 .stat-num { font-family: var(--mono); font-weight: 700; color: var(--text); }
 .stat-lbl { color: var(--faint); white-space: nowrap; }
+
+/* Slim quick-links row to the newer sections, stacked under the stats bar */
+.explore-strip {
+  position: sticky; top: 118px; height: 32px; z-index: 37;
+  display: flex; align-items: center; gap: 14px; padding: 0 16px;
+  background: var(--panel-solid); border-bottom: 1px solid var(--stroke);
+  overflow-x: auto;
+}
+.explore-label { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); flex: none; }
+.explore-link {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted);
+  text-decoration: none; white-space: nowrap; flex: none;
+}
+.explore-link:hover { color: var(--faith); }
 .ticker-scroll { display: flex; gap: 44px; white-space: nowrap; animation: ticker-scroll 78s linear infinite; padding-left: 56px; }
 .ticker:hover .ticker-scroll { animation-play-state: paused; }
 @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
