@@ -1,0 +1,302 @@
+/* Homepage bento-grid — /home route only. Uses the shared design tokens from
+   globals.css (--bg, --panel-solid, --stroke, --faith, category colors, fonts).
+   No new palette is introduced here.
+
+   NOTE — open design decision: the reference mockup uses a gold accent
+   (#D8AF63) for the wordmark/brand mark instead of the app's current green
+   (--faith) brand color. This file deliberately keeps using the existing
+   --good-news gold token only where the app already uses it (the star mark,
+   same as Nav.tsx), and green (--faith) everywhere else "brand" shows up
+   (live dot, active tab, links). Adopting gold as the primary brand accent
+   app-wide is a decision for design review, not made here. */
+
+.home-page {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 26px 24px 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.home-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.home-hero-mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.home-hero-mark h1 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: 0.12em;
+  color: var(--text);
+  margin: 0;
+}
+.home-hero-tagline {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+@media (max-width: 980px) {
+  .home-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .home-grid { grid-template-columns: 1fr; }
+}
+
+.home-tile {
+  background: var(--panel-solid);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 220px;
+}
+a.home-tile-link {
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, transform 0.15s;
+}
+a.home-tile-link:hover {
+  border-color: var(--stroke2);
+  transform: translateY(-1px);
+}
+
+.home-tile-hd {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.home-tile-eyebrow {
+  font-size: 10px;
+  color: var(--faint);
+  letter-spacing: 0.1em;
+}
+.home-tile-title {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.home-tile-chips {
+  display: flex;
+  gap: 4px;
+}
+.home-chip {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.home-chip-on {
+  background: var(--bg2);
+  color: var(--text);
+}
+
+.home-map-preview {
+  flex: 1;
+  min-height: 100px;
+  border-radius: 10px;
+  background: linear-gradient(160deg, var(--bg2), var(--bg));
+}
+
+.home-live-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.home-live-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--conflict);
+  font-size: 10px;
+  font-weight: 700;
+}
+.home-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--conflict);
+  display: inline-block;
+}
+.home-stat-num {
+  font-size: 17px;
+  font-weight: 700;
+}
+.home-stat-lbl {
+  font-size: 9px;
+  color: var(--faint);
+}
+
+.home-tile-stub {
+  flex: 1;
+  min-height: 100px;
+  border-radius: 10px;
+  background: var(--bg2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  text-align: center;
+}
+.home-tile-stub p {
+  margin: 0;
+  font-size: 11px;
+  color: var(--faint);
+  line-height: 1.5;
+  max-width: 32ch;
+}
+
+.home-tile-footnote {
+  font-size: 10.5px;
+  color: var(--muted);
+  margin: 0;
+}
+.home-tile-footnote a {
+  color: var(--faith);
+  text-decoration: none;
+}
+.home-tile-footnote a:hover {
+  text-decoration: underline;
+}
+
+.home-humanitarian-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.home-cat-chip {
+  background: var(--bg2);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  font-size: 11px;
+}
+
+.home-data-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+}
+.home-data-cell {
+  display: grid;
+  grid-template-columns: 60px 1fr 22px;
+  align-items: center;
+  gap: 8px;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.home-data-cell-bar {
+  height: 6px;
+  background: var(--dot);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.home-data-cell-bar div {
+  height: 100%;
+  border-radius: 4px;
+}
+.home-data-cell-count {
+  text-align: right;
+  color: var(--faint);
+}
+
+.home-copilot-input {
+  background: var(--bg2);
+  border: 1px solid var(--stroke);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--faint);
+  font-size: 12px;
+}
+
+.home-pulse-glow {
+  min-height: 50px;
+  border-radius: 10px;
+  background: radial-gradient(circle at 60% 40%, var(--bg2), var(--bg));
+}
+.home-pulse-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+.home-pulse-row {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: none;
+  overflow: hidden;
+}
+.home-pulse-row:hover .home-pulse-title {
+  color: var(--text);
+}
+.home-pulse-time {
+  color: var(--faint);
+  flex-shrink: 0;
+}
+.home-pulse-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.home-pulse-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: var(--faint);
+}
+
+.home-tab-bar {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: var(--panel);
+  backdrop-filter: var(--glass-blur);
+  border-top: 1px solid var(--stroke);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  font-size: 10.5px;
+  overflow-x: auto;
+  gap: 4px;
+  /* Right padding reserves room for the global "Today's Brief" FAB
+     (fixed bottom-right, every page — see .global-brief-fab) so it
+     doesn't sit on top of the last tab link. Only worth reserving on
+     wider viewports — on narrow ones the FAB already floats over
+     in-flow content everywhere else in the app. */
+  padding: 0 8px;
+}
+@media (min-width: 640px) {
+  .home-tab-bar { padding-right: 190px; }
+}
+.home-tab-bar a {
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 6px 4px;
+}
+.home-tab-bar a:hover {
+  color: var(--text);
+}
